@@ -4,28 +4,37 @@ A free, open-source e-commerce platform for building and managing online stores 
 
 Inspired by Shopify and Amazon SmartBiz, Shop Editor gives merchants a drag-and-drop storefront builder, product catalog management, order tracking, and integrated payments out of the box.
 
+**Live demo:** [https://shop-editor.vercel.app](https://shop-editor.vercel.app)
+
 ---
 
 ## Features
 
-- **Storefront Builder** — drag-and-drop block editor (hero, product grid, banners, text) to design your shop without writing code
-- **Product Management** — add products with images, descriptions, pricing, stock levels, and variants (size, color, etc.)
+- **Storefront Builder** — drag-and-drop block editor (hero, product grid, banner, text, image, CTA) to design your shop without writing code
+- **Product Management** — add products with images (Cloudinary), descriptions, pricing, stock levels, and variants
 - **Order Management** — view and manage customer orders, update fulfillment status, track payment state
-- **Payments** — Stripe integration with secure checkout and webhook-driven order confirmation
-- **Multi-shop** — one account can manage multiple shops
-- **Auth** — merchant login/register with NextAuth.js; optional OAuth (Google, GitHub)
+- **Payments** — Stripe integration with secure checkout flow and webhook-driven order confirmation
+- **Cart** — persistent cart with Zustand (survives page refresh, clears on shop change)
+- **Public Storefront** — customer-facing shop pages rendered from saved block layouts, with dynamic navigation
+- **Image Uploads** — Cloudinary-backed product and shop logo/banner uploads
+- **Auth** — merchant register/login with NextAuth.js (credentials provider, JWT sessions)
 
 ---
 
 ## Tech Stack
 
-- **Framework:** Next.js 14 (App Router) + TypeScript
-- **Database:** PostgreSQL + Prisma ORM
-- **Styling:** Tailwind CSS + shadcn/ui
-- **Auth:** NextAuth.js
-- **Payments:** Stripe
-- **Storage:** Cloudinary (product images)
-- **Drag & Drop:** @dnd-kit
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) + TypeScript |
+| Styling | Tailwind CSS + shadcn/ui |
+| Database | PostgreSQL via Prisma ORM |
+| Auth | NextAuth.js v5 (JWT strategy) |
+| Payments | Stripe (Payment Intents API) |
+| Storage | Cloudinary (product & shop images) |
+| State | Zustand v5 with persist middleware |
+| Drag & Drop | @dnd-kit |
+| Validation | Zod |
+| Hosting | Vercel + Supabase (PostgreSQL) |
 
 ---
 
@@ -34,14 +43,14 @@ Inspired by Shopify and Amazon SmartBiz, Shop Editor gives merchants a drag-and-
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL database (local or hosted — [Supabase](https://supabase.com) is free)
-- Stripe account (free to create, test mode available)
-- Cloudinary account (free tier is sufficient for most shops)
+- PostgreSQL database (local or hosted — [Supabase](https://supabase.com) free tier works great)
+- Stripe account (test mode available, no charges needed for development)
+- Cloudinary account (free tier is sufficient)
 
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/shop-editor.git
+git clone https://github.com/rkeerthick/shop-editor.git
 cd shop-editor
 ```
 
@@ -53,14 +62,10 @@ npm install
 
 ### 3. Configure environment variables
 
-Copy the example file and fill in your values:
-
-```bash
-cp .env.example .env.local
-```
+Create a `.env.local` file in the root:
 
 ```env
-# Database
+# Database (Supabase or any PostgreSQL)
 DATABASE_URL=postgresql://user:password@localhost:5432/shopeditor
 
 # NextAuth
@@ -91,7 +96,15 @@ npx prisma db seed
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the app.
+Visit [http://localhost:3000](http://localhost:3000) — you'll be redirected to the dashboard.
+
+### 6. Set up Stripe webhooks (local)
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+Copy the printed `whsec_...` secret into your `.env.local` as `STRIPE_WEBHOOK_SECRET`.
 
 ---
 
@@ -100,66 +113,79 @@ Visit [http://localhost:3000](http://localhost:3000) to see the app.
 ```
 shop-editor/
 ├── app/
-│   ├── (auth)/          # Login & register pages
-│   ├── (dashboard)/     # Merchant admin panel
-│   ├── (store)/         # Public storefront routes
-│   └── api/             # REST API handlers
+│   ├── (auth)/                  # Login & register pages
+│   ├── (dashboard)/             # Merchant admin panel
+│   │   └── dashboard/
+│   │       ├── products/        # Product CRUD
+│   │       ├── orders/          # Order management
+│   │       ├── storefront/      # Block editor
+│   │       └── settings/        # Shop settings
+│   ├── store/[shopSlug]/        # Public storefront routes
+│   │   ├── products/[slug]/     # Product detail page
+│   │   └── checkout/            # Cart & Stripe checkout
+│   └── api/                     # REST API handlers
 ├── components/
-│   ├── ui/              # shadcn/ui base components
-│   ├── dashboard/       # Admin UI components
-│   ├── storefront/      # Customer-facing components
-│   └── editor/          # Storefront block editor
-├── lib/                 # Shared utilities (db, auth, stripe)
-├── prisma/              # Schema and migrations
-└── tests/               # Unit and E2E tests
+│   ├── ui/                      # shadcn/ui base components
+│   ├── dashboard/               # Admin UI components
+│   ├── storefront/              # Customer-facing components
+│   └── editor/                  # Storefront block editor
+├── lib/                         # db, auth, stripe clients
+├── store/                       # Zustand cart store
+├── types/                       # Shared TypeScript types
+└── prisma/                      # Schema and migrations
 ```
 
 ---
 
-## Development
+## Development Commands
 
 ```bash
-npm run dev          # Start dev server
+npm run dev          # Start dev server (Turbopack)
 npm run build        # Production build
 npm run typecheck    # TypeScript type checking
 npm run lint         # ESLint
-npm run test         # Unit tests (Vitest)
-npm run test:e2e     # E2E tests (Playwright)
 npx prisma studio    # Visual database browser
+npx prisma migrate dev   # Apply schema changes
 ```
 
 ---
 
 ## Deployment
 
-Shop Editor can be deployed anywhere Next.js runs:
+Deployed on **Vercel** with **Supabase** (PostgreSQL). Any Next.js-compatible host works.
 
 | Platform | Notes |
 |---|---|
 | **Vercel** | Recommended — zero config, free tier available |
-| **Railway** | Postgres + app in one place, free starter |
+| **Railway** | Postgres + app in one place |
 | **Fly.io** | Docker-based, full control |
-| **Self-hosted** | Run `npm run build && npm start` on any VPS |
+| **Self-hosted** | `npm run build && npm start` on any VPS |
 
-For production, make sure to:
+### Production checklist
+
 1. Set all environment variables in your hosting provider
-2. Run `npx prisma migrate deploy` (not `dev`) for migrations
-3. Set up a Stripe webhook pointing to `https://your-domain/api/webhooks/stripe`
+2. Update `NEXTAUTH_URL` to your production domain
+3. Run `npx prisma migrate deploy` (not `dev`) for migrations
+4. Create a Stripe webhook endpoint pointing to `https://your-domain/api/webhooks/stripe` with event `payment_intent.succeeded`
+5. Add the production `whsec_...` signing secret as `STRIPE_WEBHOOK_SECRET`
 
 ---
 
 ## Roadmap
 
-- [x] Project setup and architecture
-- [ ] Auth (login, register, sessions)
-- [ ] Shop setup wizard
-- [ ] Product management (CRUD + image upload)
-- [ ] Storefront block editor
-- [ ] Public storefront rendering
-- [ ] Cart and checkout
-- [ ] Stripe payment integration
-- [ ] Order management dashboard
-- [ ] Post-MVP: analytics, email, shipping APIs
+- [x] Auth — register, login, JWT sessions
+- [x] Shop setup — name, slug, logo, banner, settings
+- [x] Product management — CRUD with image uploads and variants
+- [x] Storefront block editor — drag-and-drop hero, grid, banner, text, image, CTA
+- [x] Public storefront — dynamic pages rendered from saved layouts
+- [x] Cart & checkout — Stripe Elements, multi-step checkout
+- [x] Payments — Stripe Payment Intents + webhook order fulfillment
+- [x] Order management — dashboard with status updates
+- [ ] Analytics dashboard
+- [ ] Email notifications (order confirmation)
+- [ ] Shipping rate APIs (EasyPost, Shippo)
+- [ ] Multi-currency support
+- [ ] Tax calculation (TaxJar / Avalara)
 
 ---
 
