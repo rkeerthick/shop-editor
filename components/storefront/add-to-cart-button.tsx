@@ -1,7 +1,6 @@
 "use client";
 
 import { useCartStore } from "@/store/cart";
-import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
   shopSlug: string;
@@ -15,12 +14,11 @@ export function AddToCartButton({ shopSlug, productId, title, price, image }: Ad
   const addItem = useCartStore((s) => s.addItem);
 
   return (
-    <Button
-      size="sm"
-      className="w-full mt-2"
+    <button
+      className="store-btn w-full py-2 px-4 text-sm font-semibold text-white transition-all"
       onClick={() => addItem(shopSlug, { productId, title, price, image })}
     >
       Add to Cart
-    </Button>
+    </button>
   );
 }

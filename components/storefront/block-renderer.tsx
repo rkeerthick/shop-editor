@@ -19,7 +19,7 @@ function HeroBlock({ p }: { p: Record<string, unknown> }) {
         {bool(p.buttonText) && (
           <a
             href={str(p.buttonLink) || "#"}
-            className="inline-flex items-center px-8 py-3.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5"
+            className="store-btn inline-flex items-center px-8 py-3.5 text-white font-semibold transition-all shadow-lg hover:-translate-y-0.5"
           >
             {str(p.buttonText)}
           </a>
@@ -51,7 +51,7 @@ async function ProductGridBlock({ p, shopSlug }: { p: Record<string, unknown>; s
       {bool(p.heading) && (
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-slate-900">{str(p.heading)}</h2>
-          <div className="w-12 h-1 bg-indigo-500 rounded-full mx-auto mt-3" />
+          <div className="brand-bg w-12 h-1 rounded-full mx-auto mt-3" />
         </div>
       )}
       <div className={`grid ${colClass} gap-6`}>
@@ -78,7 +78,7 @@ async function ProductGridBlock({ p, shopSlug }: { p: Record<string, unknown>; s
                   <a href={`/store/${shopSlug}/products/${product.slug}`} className="hover:text-indigo-600 transition-colors">
                     <p className="font-semibold text-slate-800 mb-1 line-clamp-2">{product.title}</p>
                   </a>
-                  <p className="text-indigo-600 font-bold text-lg mb-4">${Number(product.price).toFixed(2)}</p>
+                  <p className="brand-text font-bold text-lg mb-4">${Number(product.price).toFixed(2)}</p>
                   <AddToCartButton
                     shopSlug={shopSlug}
                     productId={product.id}
@@ -149,11 +149,7 @@ function CtaBlock({ p }: { p: Record<string, unknown> }) {
       {bool(p.buttonText) && (
         <a
           href={str(p.buttonLink) || "#"}
-          className={`inline-flex items-center px-8 py-3.5 rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-lg ${
-            dark
-              ? "bg-indigo-500 text-white hover:bg-indigo-400 shadow-indigo-500/30"
-              : "bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20"
-          }`}
+          className={`store-btn inline-flex items-center px-8 py-3.5 font-semibold transition-all hover:-translate-y-0.5 shadow-lg text-white`}
         >
           {str(p.buttonText)}
         </a>

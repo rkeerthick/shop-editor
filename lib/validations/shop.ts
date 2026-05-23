@@ -19,6 +19,11 @@ export const updateShopSchema = z.object({
   logoUrl: z.string().optional().nullable(),
   bannerUrl: z.string().optional().nullable(),
   isActive: z.boolean().optional(),
+  theme: z.object({
+    accentColor: z.string().optional(),
+    fontStyle: z.enum(["modern", "classic", "minimal"]).optional(),
+    buttonStyle: z.enum(["rounded", "pill", "sharp"]).optional(),
+  }).optional(),
 });
 
 export type CreateShopInput = z.infer<typeof createShopSchema>;
