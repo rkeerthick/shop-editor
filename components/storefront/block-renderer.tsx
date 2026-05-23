@@ -9,15 +9,18 @@ function bool(v: unknown): boolean { return Boolean(v); }
 function HeroBlock({ p }: { p: Record<string, unknown> }) {
   return (
     <section
-      className="relative flex flex-col items-center justify-center text-center py-28 px-6 bg-gray-900 text-white"
+      className="relative flex flex-col items-center justify-center text-center py-36 px-6 bg-slate-900 text-white overflow-hidden"
       style={bool(p.backgroundImage) ? { backgroundImage: `url(${str(p.backgroundImage)})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
     >
-      <div className="absolute inset-0 bg-black/40" />
-      <div className="relative z-10">
-        <h1 className="text-4xl font-bold mb-4">{str(p.heading)}</h1>
-        <p className="text-lg opacity-80 mb-8 max-w-xl">{str(p.subheading)}</p>
+      <div className="absolute inset-0 bg-linear-to-br from-slate-900/80 via-indigo-950/60 to-slate-900/80" />
+      <div className="relative z-10 max-w-2xl mx-auto">
+        <h1 className="text-5xl font-bold mb-5 leading-tight tracking-tight">{str(p.heading)}</h1>
+        <p className="text-lg text-slate-300 mb-10 max-w-xl mx-auto leading-relaxed">{str(p.subheading)}</p>
         {bool(p.buttonText) && (
-          <a href={str(p.buttonLink) || "#"} className="px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+          <a
+            href={str(p.buttonLink) || "#"}
+            className="inline-flex items-center px-8 py-3.5 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5"
+          >
             {str(p.buttonText)}
           </a>
         )}
@@ -28,16 +31,10 @@ function HeroBlock({ p }: { p: Record<string, unknown> }) {
 
 type ProductRow = { id: string; title: string; price: unknown; images: string[]; slug: string };
 
-async function ProductGridBlock({
-  p,
-  shopSlug,
-}: {
-  p: Record<string, unknown>;
-  shopSlug: string;
-}) {
+async function ProductGridBlock({ p, shopSlug }: { p: Record<string, unknown>; shopSlug: string }) {
   const cols = num(p.columns) || 3;
   const limit = num(p.limit) || 6;
-  const colClass = cols === 2 ? "grid-cols-2" : cols === 4 ? "grid-cols-4" : "grid-cols-3";
+  const colClass = cols === 2 ? "grid-cols-2" : cols === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3";
 
   let products: ProductRow[] = [];
   if (shopSlug) {
@@ -50,27 +47,38 @@ async function ProductGridBlock({
   }
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-12">
-      {bool(p.heading) && <h2 className="text-2xl font-bold mb-8 text-center">{str(p.heading)}</h2>}
+    <section className="max-w-7xl mx-auto px-6 py-16">
+      {bool(p.heading) && (
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-slate-900">{str(p.heading)}</h2>
+          <div className="w-12 h-1 bg-indigo-500 rounded-full mx-auto mt-3" />
+        </div>
+      )}
       <div className={`grid ${colClass} gap-6`}>
         {products.length > 0
           ? products.map((product) => (
-              <div key={product.id} className="border rounded-lg overflow-hidden bg-white hover:shadow-md transition-shadow">
+              <div key={product.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group">
                 <a href={`/store/${shopSlug}/products/${product.slug}`} className="block">
-                  <div className="bg-gray-100 aspect-square overflow-hidden">
+                  <div className="bg-slate-50 aspect-square overflow-hidden">
                     {product.images[0] ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover" />
+                      <img
+                        src={product.images[0]}
+                        alt={product.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
                     ) : (
-                      <div className="w-full h-full bg-gray-200" />
+                      <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                        <span className="text-4xl">📦</span>
+                      </div>
                     )}
                   </div>
                 </a>
-                <div className="p-4">
-                  <a href={`/store/${shopSlug}/products/${product.slug}`} className="hover:underline">
-                    <p className="font-medium">{product.title}</p>
+                <div className="p-5">
+                  <a href={`/store/${shopSlug}/products/${product.slug}`} className="hover:text-indigo-600 transition-colors">
+                    <p className="font-semibold text-slate-800 mb-1 line-clamp-2">{product.title}</p>
                   </a>
-                  <p className="text-muted-foreground text-sm mb-3">${Number(product.price).toFixed(2)}</p>
+                  <p className="text-indigo-600 font-bold text-lg mb-4">${Number(product.price).toFixed(2)}</p>
                   <AddToCartButton
                     shopSlug={shopSlug}
                     productId={product.id}
@@ -82,10 +90,10 @@ async function ProductGridBlock({
               </div>
             ))
           : Array.from({ length: limit }).map((_, i) => (
-              <div key={i} className="border rounded-lg overflow-hidden bg-white">
-                <div className="bg-gray-100 aspect-square" />
-                <div className="p-4">
-                  <p className="font-medium text-muted-foreground">No products yet</p>
+              <div key={i} className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                <div className="bg-slate-100 aspect-square animate-pulse" />
+                <div className="p-5">
+                  <p className="font-medium text-slate-400 text-sm">No products yet</p>
                 </div>
               </div>
             ))}
@@ -97,8 +105,8 @@ async function ProductGridBlock({
 function BannerBlock({ p }: { p: Record<string, unknown> }) {
   const content = (
     <div
-      className="py-4 px-6 text-center text-sm font-medium"
-      style={{ backgroundColor: str(p.backgroundColor) || "#1a1a1a", color: str(p.textColor) || "#fff" }}
+      className="py-3.5 px-6 text-center text-sm font-semibold tracking-wide"
+      style={{ backgroundColor: str(p.backgroundColor) || "#4F46E5", color: str(p.textColor) || "#fff" }}
     >
       {str(p.text)}
     </div>
@@ -108,22 +116,22 @@ function BannerBlock({ p }: { p: Record<string, unknown> }) {
 
 function TextBlock({ p }: { p: Record<string, unknown> }) {
   return (
-    <section className="max-w-3xl mx-auto px-4 py-12" style={{ textAlign: (str(p.alignment) as "left" | "center" | "right") || "left" }}>
-      {bool(p.heading) && <h2 className="text-2xl font-bold mb-4">{str(p.heading)}</h2>}
-      <p className="text-muted-foreground leading-relaxed">{str(p.body)}</p>
+    <section className="max-w-3xl mx-auto px-6 py-16" style={{ textAlign: (str(p.alignment) as "left" | "center" | "right") || "left" }}>
+      {bool(p.heading) && <h2 className="text-3xl font-bold text-slate-900 mb-5">{str(p.heading)}</h2>}
+      <p className="text-slate-600 leading-relaxed text-lg">{str(p.body)}</p>
     </section>
   );
 }
 
 function ImageBlock({ p }: { p: Record<string, unknown> }) {
-  const wrapClass = bool(p.fullWidth) ? "w-full" : "max-w-3xl mx-auto px-4 py-8";
+  const wrapClass = bool(p.fullWidth) ? "w-full" : "max-w-4xl mx-auto px-6 py-10";
   return (
     <section className={wrapClass}>
       {bool(p.src) ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={str(p.src)} alt={str(p.alt)} className="w-full object-cover" />
+        <img src={str(p.src)} alt={str(p.alt)} className="w-full object-cover rounded-2xl" />
       ) : null}
-      {bool(p.caption) && <p className="text-xs text-muted-foreground text-center mt-2">{str(p.caption)}</p>}
+      {bool(p.caption) && <p className="text-xs text-slate-400 text-center mt-3">{str(p.caption)}</p>}
     </section>
   );
 }
@@ -131,13 +139,21 @@ function ImageBlock({ p }: { p: Record<string, unknown> }) {
 function CtaBlock({ p }: { p: Record<string, unknown> }) {
   const dark = str(p.variant) !== "light";
   return (
-    <section className={`py-20 px-6 text-center ${dark ? "bg-gray-900 text-white" : "bg-gray-50"}`}>
-      <h2 className="text-3xl font-bold mb-3">{str(p.heading)}</h2>
-      {bool(p.subheading) && <p className="text-lg opacity-70 mb-8">{str(p.subheading)}</p>}
+    <section className={`py-24 px-6 text-center ${dark ? "bg-slate-900 text-white" : "bg-indigo-50"}`}>
+      <h2 className="text-4xl font-bold mb-4 tracking-tight">{str(p.heading)}</h2>
+      {bool(p.subheading) && (
+        <p className={`text-lg mb-10 max-w-lg mx-auto ${dark ? "text-slate-400" : "text-slate-600"}`}>
+          {str(p.subheading)}
+        </p>
+      )}
       {bool(p.buttonText) && (
         <a
           href={str(p.buttonLink) || "#"}
-          className={`px-8 py-3 rounded-lg font-semibold transition-colors ${dark ? "bg-white text-gray-900 hover:bg-gray-100" : "bg-gray-900 text-white hover:bg-gray-800"}`}
+          className={`inline-flex items-center px-8 py-3.5 rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-lg ${
+            dark
+              ? "bg-indigo-500 text-white hover:bg-indigo-400 shadow-indigo-500/30"
+              : "bg-slate-900 text-white hover:bg-slate-800 shadow-slate-900/20"
+          }`}
         >
           {str(p.buttonText)}
         </a>
@@ -146,16 +162,10 @@ function CtaBlock({ p }: { p: Record<string, unknown> }) {
   );
 }
 
-export async function BlockRenderer({
-  blocks,
-  shopSlug = "",
-}: {
-  blocks: EditorBlock[];
-  shopSlug?: string;
-}) {
+export async function BlockRenderer({ blocks, shopSlug = "" }: { blocks: EditorBlock[]; shopSlug?: string }) {
   if (blocks.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
+      <div className="flex items-center justify-center min-h-[60vh] text-slate-400">
         This page has no content yet.
       </div>
     );

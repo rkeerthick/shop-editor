@@ -22,16 +22,21 @@ export default async function StoreLayout({
   });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b bg-white sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <a href={`/store/${shopSlug}`} className="font-bold text-lg shrink-0">{shop.name}</a>
-          <nav className="flex items-center gap-5 text-sm overflow-x-auto">
+    <div className="min-h-screen flex flex-col bg-white">
+      <header className="bg-white border-b border-slate-100 sticky top-0 z-10 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+          <a
+            href={`/store/${shopSlug}`}
+            className="font-bold text-xl text-slate-900 shrink-0 tracking-tight hover:text-indigo-600 transition-colors"
+          >
+            {shop.name}
+          </a>
+          <nav className="flex items-center gap-6 text-sm overflow-x-auto">
             {pages.map((page) => (
               <a
                 key={page.slug}
                 href={page.isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${page.slug}`}
-                className="text-muted-foreground hover:text-foreground whitespace-nowrap transition-colors"
+                className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
               >
                 {page.title}
               </a>
@@ -42,8 +47,11 @@ export default async function StoreLayout({
         </div>
       </header>
       <main className="flex-1">{children}</main>
-      <footer className="border-t py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} {shop.name}. Powered by Shop Editor.
+      <footer className="border-t border-slate-100 bg-slate-50 py-10">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-400">
+          <span className="font-semibold text-slate-700">{shop.name}</span>
+          <span>© {new Date().getFullYear()} {shop.name}. Powered by Shop Editor.</span>
+        </div>
       </footer>
     </div>
   );
