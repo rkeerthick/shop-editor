@@ -4,16 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   LayoutDashboard, Package, ShoppingCart, Paintbrush,
-  Tag, Settings, ExternalLink, LogOut, Store, ChevronLeft,
+  Tag, Settings, ExternalLink, LogOut, Store, ChevronLeft, BarChart2,
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { href: "/dashboard",            label: "Overview",   icon: LayoutDashboard },
-  { href: "/dashboard/products",   label: "Products",   icon: Package },
-  { href: "/dashboard/orders",     label: "Orders",     icon: ShoppingCart },
-  { href: "/dashboard/storefront", label: "Storefront", icon: Paintbrush },
-  { href: "/dashboard/discounts",  label: "Discounts",  icon: Tag },
-  { href: "/dashboard/settings",   label: "Settings",   icon: Settings },
+  { href: "/dashboard",             label: "Overview",   icon: LayoutDashboard },
+  { href: "/dashboard/analytics",   label: "Analytics",  icon: BarChart2 },
+  { href: "/dashboard/products",    label: "Products",   icon: Package },
+  { href: "/dashboard/orders",      label: "Orders",     icon: ShoppingCart },
+  { href: "/dashboard/storefront",  label: "Storefront", icon: Paintbrush },
+  { href: "/dashboard/discounts",   label: "Discounts",  icon: Tag },
+  { href: "/dashboard/settings",    label: "Settings",   icon: Settings },
 ];
 
 interface SidebarProps {

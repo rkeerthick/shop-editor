@@ -1,6 +1,6 @@
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
-import { sendLowStockAlert } from "@/lib/email";
+import { sendLowStockAlert, sendOrderConfirmation } from "@/lib/email";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       include: {
         items: { include: { product: true } },
         shop: { include: { owner: true } },
+        customer: true,
       },
     });
 
@@ -46,6 +47,22 @@ export async function POST(req: Request) {
         data: { stock: { decrement: item.quantity } },
       });
     }
+
+    // Send order confirmation to customer
+    await sendOrderConfirmation({
+      customerEmail: order.customer.email,
+      customerName: order.customer.name ?? "Customer",
+      shopName: order.shop.name,
+      orderId: order.id,
+      items: order.items.map((i) => ({
+        title: i.product.title,
+        quantity: i.quantity,
+        unitPrice: Number(i.unitPrice),
+      })),
+      subtotal: Number(order.subtotal),
+      discountAmount: Number(order.discountAmount),
+      total: Number(order.total),
+    }).catch((err) => console.error("[order-confirmation-email]", err));
 
     // Check for low stock and alert merchant
     const updatedProducts = await db.product.findMany({

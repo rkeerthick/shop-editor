@@ -13,14 +13,129 @@ export async function sendLowStockAlert({
 }) {
   if (!process.env.RESEND_API_KEY) return;
 
-  const productList = products
-    .map((p) => `• ${p.title} — ${p.stock} left`)
-    .join("\n");
+  const productList = products.map((p) => `• ${p.title} — ${p.stock} left`).join("\n");
 
   await resend.emails.send({
     from: "Shop Editor <onboarding@resend.dev>",
     to: merchantEmail,
     subject: `Low stock alert — ${shopName}`,
     text: `Hi,\n\nThe following products in your shop "${shopName}" are running low on stock:\n\n${productList}\n\nLog in to your dashboard to restock: https://shop-editor.vercel.app/dashboard/products\n\n— Shop Editor`,
+  });
+}
+
+export async function sendOrderConfirmation({
+  customerEmail,
+  customerName,
+  shopName,
+  orderId,
+  items,
+  subtotal,
+  discountAmount,
+  total,
+}: {
+  customerEmail: string;
+  customerName: string;
+  shopName: string;
+  orderId: string;
+  items: { title: string; quantity: number; unitPrice: number }[];
+  subtotal: number;
+  discountAmount: number;
+  total: number;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+
+  const itemLines = items
+    .map((i) => `  ${i.title} × ${i.quantity}   $${(i.unitPrice * i.quantity).toFixed(2)}`)
+    .join("\n");
+
+  const discountLine = discountAmount > 0
+    ? `  Discount:              -$${discountAmount.toFixed(2)}\n`
+    : "";
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#4338ca,#6366f1);padding:36px 40px;text-align:center;">
+            <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.5px;">${shopName}</h1>
+            <p style="margin:8px 0 0;color:#c7d2fe;font-size:14px;">Order Confirmation</p>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:36px 40px;">
+            <p style="margin:0 0 6px;color:#334155;font-size:16px;font-weight:600;">Hi ${customerName},</p>
+            <p style="margin:0 0 28px;color:#64748b;font-size:14px;line-height:1.6;">
+              Thanks for your order! We've received your payment and are getting things ready.
+            </p>
+
+            <!-- Order ID -->
+            <div style="background:#f1f5f9;border-radius:10px;padding:14px 18px;margin-bottom:28px;">
+              <p style="margin:0;color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Order ID</p>
+              <p style="margin:4px 0 0;color:#1e293b;font-size:13px;font-family:monospace;">${orderId}</p>
+            </div>
+
+            <!-- Items -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+              <tr>
+                <td colspan="2" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+                  <p style="margin:0;color:#1e293b;font-size:14px;font-weight:600;">Order Summary</p>
+                </td>
+              </tr>
+              ${items.map((i) => `
+              <tr>
+                <td style="padding:12px 0;color:#334155;font-size:14px;border-bottom:1px solid #f1f5f9;">
+                  ${i.title} <span style="color:#94a3b8;">× ${i.quantity}</span>
+                </td>
+                <td style="padding:12px 0;color:#334155;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #f1f5f9;">
+                  $${(i.unitPrice * i.quantity).toFixed(2)}
+                </td>
+              </tr>`).join("")}
+              ${discountAmount > 0 ? `
+              <tr>
+                <td style="padding:12px 0;color:#16a34a;font-size:14px;">Discount</td>
+                <td style="padding:12px 0;color:#16a34a;font-size:14px;font-weight:600;text-align:right;">-$${discountAmount.toFixed(2)}</td>
+              </tr>` : ""}
+              <tr>
+                <td style="padding:16px 0 0;color:#1e293b;font-size:16px;font-weight:700;">Total</td>
+                <td style="padding:16px 0 0;color:#4f46e5;font-size:18px;font-weight:700;text-align:right;">$${total.toFixed(2)}</td>
+              </tr>
+            </table>
+
+            <p style="margin:0;color:#64748b;font-size:13px;line-height:1.6;">
+              If you have any questions about your order, feel free to reply to this email.
+            </p>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f8fafc;padding:24px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">
+              © ${new Date().getFullYear()} ${shopName}. Powered by Shop Editor.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  await resend.emails.send({
+    from: "Shop Editor <onboarding@resend.dev>",
+    to: customerEmail,
+    subject: `Order confirmed — ${shopName}`,
+    html,
+    text: `Hi ${customerName},\n\nThanks for your order at ${shopName}!\n\nOrder ID: ${orderId}\n\nItems:\n${itemLines}\n\n${discountLine}Total: $${total.toFixed(2)}\n\n— ${shopName}`,
   });
 }
