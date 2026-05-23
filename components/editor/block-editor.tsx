@@ -35,13 +35,18 @@ interface BlockEditorProps {
   isHome: boolean;
   shopSlug: string;
   initialBlocks: EditorBlock[];
+  initialMetaTitle: string;
+  initialMetaDescription: string;
 }
 
-export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, initialBlocks }: BlockEditorProps) {
+export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, initialBlocks, initialMetaTitle, initialMetaDescription }: BlockEditorProps) {
   const [blocks, setBlocks] = useState<EditorBlock[]>(initialBlocks);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [metaTitle, setMetaTitle] = useState(initialMetaTitle);
+  const [metaDescription, setMetaDescription] = useState(initialMetaDescription);
+  const [showSeo, setShowSeo] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -87,15 +92,22 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
 
   const save = useCallback(async () => {
     setSaving(true);
-    await fetch(`/api/storefront/pages/${pageId}/blocks`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(blocks.map((b, i) => ({ ...b, order: i }))),
-    });
+    await Promise.all([
+      fetch(`/api/storefront/pages/${pageId}/blocks`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(blocks.map((b, i) => ({ ...b, order: i }))),
+      }),
+      fetch(`/api/storefront/pages/${pageId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ metaTitle: metaTitle || null, metaDescription: metaDescription || null }),
+      }),
+    ]);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
-  }, [blocks, pageId]);
+  }, [blocks, pageId, metaTitle, metaDescription]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-2rem)] -m-8">
@@ -122,7 +134,7 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left — add blocks */}
+        {/* Left — add blocks + SEO */}
         <div className="w-48 bg-white border-r p-3 flex flex-col gap-1 overflow-y-auto shrink-0">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Add block</p>
           {BLOCK_TYPES.map((type) => (
@@ -134,6 +146,37 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
               {BLOCK_LABELS[type]}
             </button>
           ))}
+          <div className="mt-4 border-t pt-3">
+            <button
+              onClick={() => setShowSeo((v) => !v)}
+              className="text-left px-2 py-1.5 rounded text-xs w-full hover:bg-gray-100 transition-colors font-semibold text-muted-foreground uppercase tracking-wide"
+            >
+              SEO {showSeo ? "▲" : "▼"}
+            </button>
+            {showSeo && (
+              <div className="flex flex-col gap-2 mt-2 px-1">
+                <div>
+                  <label className="text-xs text-muted-foreground">Meta title</label>
+                  <input
+                    className="w-full border rounded px-2 py-1 text-xs mt-0.5"
+                    placeholder={pageTitle}
+                    value={metaTitle}
+                    onChange={(e) => setMetaTitle(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Meta description</label>
+                  <textarea
+                    className="w-full border rounded px-2 py-1 text-xs mt-0.5 resize-none"
+                    rows={3}
+                    placeholder="Page description for search engines"
+                    value={metaDescription}
+                    onChange={(e) => setMetaDescription(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Center — canvas */}

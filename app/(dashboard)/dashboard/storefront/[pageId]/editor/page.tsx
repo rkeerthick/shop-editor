@@ -31,6 +31,8 @@ export default async function EditorPage({ params }: { params: Promise<{ pageId:
       isHome={page.isHome}
       shopSlug={page.shop.slug}
       initialBlocks={blocks}
+      initialMetaTitle={page.metaTitle ?? ""}
+      initialMetaDescription={page.metaDescription ?? ""}
     />
   );
 }

@@ -29,6 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <NavLink href="/dashboard/products">Products</NavLink>
             <NavLink href="/dashboard/orders">Orders</NavLink>
             <NavLink href="/dashboard/storefront">Storefront</NavLink>
+            <NavLink href="/dashboard/discounts">Discounts</NavLink>
             <NavLink href="/dashboard/settings">Settings</NavLink>
           </nav>
           <div className="mt-auto px-2">

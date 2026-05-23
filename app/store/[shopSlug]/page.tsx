@@ -2,6 +2,25 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { BlockRenderer } from "@/components/storefront/block-renderer";
 import type { EditorBlock } from "@/types/blocks";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ shopSlug: string }>;
+}): Promise<Metadata> {
+  const { shopSlug } = await params;
+  const shop = await db.shop.findUnique({ where: { slug: shopSlug } });
+  if (!shop) return {};
+  const page = await db.storefrontPage.findFirst({
+    where: { shopId: shop.id, isHome: true },
+    select: { metaTitle: true, metaDescription: true },
+  });
+  return {
+    title: page?.metaTitle || shop.name,
+    description: page?.metaDescription || shop.description || undefined,
+  };
+}
 
 export default async function StorefrontHomePage({
   params,

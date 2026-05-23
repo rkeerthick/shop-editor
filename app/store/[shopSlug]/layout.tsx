@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { CartIcon } from "@/components/storefront/cart-icon";
+import { SearchBar } from "@/components/storefront/search-bar";
 
 export default async function StoreLayout({
   children,
@@ -35,6 +36,7 @@ export default async function StoreLayout({
                 {page.title}
               </a>
             ))}
+            <SearchBar shopSlug={shopSlug} />
             <CartIcon shopSlug={shopSlug} />
           </nav>
         </div>
