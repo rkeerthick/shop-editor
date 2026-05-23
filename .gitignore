@@ -39,6 +39,9 @@ yarn-error.log*
 # claude code
 .claude/
 
+# local dev notes (contains sensitive info)
+DEV_NOTES.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
