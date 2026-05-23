@@ -24,7 +24,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
           shopName={shop.name}
           shopSlug={shop.slug}
           email={session.user?.email ?? ""}
-          pathname={pathname}
         />
       )}
       <main className="flex-1 overflow-auto">

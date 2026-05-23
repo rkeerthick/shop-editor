@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, ShoppingCart, Paintbrush,
   Tag, Settings, ExternalLink, LogOut, Store, ChevronLeft, BarChart2,
@@ -21,11 +22,11 @@ interface SidebarProps {
   shopName: string;
   shopSlug: string;
   email: string;
-  pathname: string;
 }
 
-export function Sidebar({ shopName, shopSlug, email, pathname }: SidebarProps) {
+export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
 
   return (
     <aside
