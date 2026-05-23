@@ -24,26 +24,30 @@ export default async function StoreLayout({
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <header className="bg-white border-b border-slate-100 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between gap-6">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a
             href={`/store/${shopSlug}`}
             className="font-bold text-xl text-slate-900 shrink-0 tracking-tight hover:text-indigo-600 transition-colors"
           >
             {shop.name}
           </a>
-          <nav className="flex items-center gap-6 text-sm overflow-x-auto">
-            {pages.map((page) => (
-              <a
-                key={page.slug}
-                href={page.isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${page.slug}`}
-                className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
-              >
-                {page.title}
-              </a>
-            ))}
-            <SearchBar shopSlug={shopSlug} />
-            <CartIcon shopSlug={shopSlug} />
-          </nav>
+          <div className="flex items-center gap-8">
+            <nav className="hidden sm:flex items-center gap-6 text-sm">
+              {pages.map((page) => (
+                <a
+                  key={page.slug}
+                  href={page.isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${page.slug}`}
+                  className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
+                >
+                  {page.title}
+                </a>
+              ))}
+            </nav>
+            <div className="flex items-center gap-4">
+              <SearchBar shopSlug={shopSlug} />
+              <CartIcon shopSlug={shopSlug} />
+            </div>
+          </div>
         </div>
       </header>
       <main className="flex-1">{children}</main>
