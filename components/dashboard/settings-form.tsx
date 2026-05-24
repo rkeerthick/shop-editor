@@ -171,7 +171,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
             <span className="text-sm font-semibold px-4 py-1.5 text-white rounded-lg" style={{ backgroundColor: accentColor }}>
               Button
             </span>
-            <span className="text-sm font-bold" style={{ color: accentColor }}>$99.00</span>
+            <span className="text-sm font-bold" style={{ color: accentColor }}>₹99.00</span>
           </div>
         </div>
 

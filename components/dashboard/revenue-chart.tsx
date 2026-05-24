@@ -46,12 +46,12 @@ export function RevenueChart({ data }: Props) {
           tick={{ fontSize: 11, fill: "#94a3b8" }}
           axisLine={false}
           tickLine={false}
-          tickFormatter={(v) => `$${v}`}
+          tickFormatter={(v) => `₹${v}`}
           width={55}
         />
         <Tooltip
           contentStyle={{ borderRadius: "10px", border: "1px solid #e2e8f0", boxShadow: "0 4px 16px rgba(0,0,0,0.08)", fontSize: 13 }}
-          formatter={(value) => [`$${Number(value).toFixed(2)}`, "Revenue"]}
+          formatter={(value) => [`₹${Number(value).toFixed(2)}`, "Revenue"]}
           labelStyle={{ color: "#475569", fontWeight: 600, marginBottom: 4 }}
         />
         <Area

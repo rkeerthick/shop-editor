@@ -61,9 +61,18 @@ export default async function OrderDetailPage({
             Placed on {new Date(order.createdAt).toLocaleString()}
           </p>
         </div>
-        <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${STATUS_STYLES[order.status]}`}>
-          {order.status}
-        </span>
+        <div className="flex items-center gap-3">
+          <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${STATUS_STYLES[order.status]}`}>
+            {order.status}
+          </span>
+          <Link
+            href={`/dashboard/orders/${order.id}/invoice`}
+            target="_blank"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+          >
+            Invoice ↗
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -108,17 +117,35 @@ export default async function OrderDetailPage({
                   </div>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">× {item.quantity}</td>
-                <td className="px-4 py-3 text-right">${Number(item.unitPrice).toFixed(2)}</td>
+                <td className="px-4 py-3 text-right">₹{Number(item.unitPrice).toFixed(2)}</td>
                 <td className="px-4 py-3 text-right font-medium">
-                  ${(Number(item.unitPrice) * item.quantity).toFixed(2)}
+                  ₹{(Number(item.unitPrice) * item.quantity).toFixed(2)}
                 </td>
               </tr>
             ))}
           </tbody>
-          <tfoot className="border-t bg-gray-50">
+          <tfoot className="border-t bg-gray-50 text-sm">
             <tr>
+              <td colSpan={3} className="px-4 py-2 text-right text-muted-foreground">Subtotal</td>
+              <td className="px-4 py-2 text-right">₹{Number(order.subtotal).toFixed(2)}</td>
+            </tr>
+            {Number(order.discountAmount) > 0 && (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 text-right text-green-600">Discount</td>
+                <td className="px-4 py-2 text-right text-green-600">−₹{Number(order.discountAmount).toFixed(2)}</td>
+              </tr>
+            )}
+            {Number(order.shippingAmount) > 0 && (
+              <tr>
+                <td colSpan={3} className="px-4 py-2 text-right text-muted-foreground">
+                  Shipping{order.shippingRateName ? ` (${order.shippingRateName})` : ""}
+                </td>
+                <td className="px-4 py-2 text-right">₹{Number(order.shippingAmount).toFixed(2)}</td>
+              </tr>
+            )}
+            <tr className="border-t">
               <td colSpan={3} className="px-4 py-3 text-right font-semibold">Total</td>
-              <td className="px-4 py-3 text-right font-bold text-lg">${Number(order.total).toFixed(2)}</td>
+              <td className="px-4 py-3 text-right font-bold text-lg">₹{Number(order.total).toFixed(2)}</td>
             </tr>
           </tfoot>
         </table>

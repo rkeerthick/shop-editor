@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -26,8 +27,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           email={session.user?.email ?? ""}
         />
       )}
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">{children}</div>
+      <main className="flex-1 overflow-auto flex flex-col">
+        {shop && <DashboardHeader shopId={shop.id} />}
+        <div className="p-8 flex-1">{children}</div>
       </main>
     </div>
   );

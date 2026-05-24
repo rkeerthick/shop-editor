@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { Package, ShoppingCart, DollarSign, TrendingUp } from "lucide-react";
+import { Package, ShoppingCart, IndianRupee, TrendingUp } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -36,8 +36,8 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
         <StatCard
           label="Revenue"
-          value={`$${revenue.toFixed(2)}`}
-          icon={DollarSign}
+          value={`₹${revenue.toFixed(2)}`}
+          icon={IndianRupee}
           color="indigo"
           sub="from paid orders"
         />

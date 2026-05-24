@@ -30,30 +30,89 @@ function HeroBlock({ p }: { p: Record<string, unknown> }) {
 }
 
 type ProductRow = { id: string; title: string; price: unknown; images: string[]; slug: string };
+type CategoryRow = { id: string; name: string; slug: string };
 
-async function ProductGridBlock({ p, shopSlug }: { p: Record<string, unknown>; shopSlug: string }) {
+async function ProductGridBlock({
+  p, shopSlug, categorySlug,
+}: {
+  p: Record<string, unknown>;
+  shopSlug: string;
+  categorySlug?: string;
+}) {
   const cols = num(p.columns) || 3;
   const limit = num(p.limit) || 6;
   const colClass = cols === 2 ? "grid-cols-2" : cols === 4 ? "grid-cols-2 md:grid-cols-4" : "grid-cols-2 md:grid-cols-3";
 
   let products: ProductRow[] = [];
+  let categories: CategoryRow[] = [];
+
   if (shopSlug) {
-    products = await db.product.findMany({
-      where: { shop: { slug: shopSlug }, isActive: true },
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      select: { id: true, title: true, price: true, images: true, slug: true },
-    });
+    const shop = await db.shop.findUnique({ where: { slug: shopSlug }, select: { id: true } });
+    if (shop) {
+      categories = await db.category.findMany({
+        where: { shopId: shop.id },
+        select: { id: true, name: true, slug: true },
+        orderBy: { name: "asc" },
+      });
+
+      const activeCategory = categorySlug
+        ? categories.find((c) => c.slug === categorySlug)
+        : null;
+
+      products = await db.product.findMany({
+        where: {
+          shop: { slug: shopSlug },
+          isActive: true,
+          ...(activeCategory ? { categoryId: activeCategory.id } : {}),
+        },
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: { id: true, title: true, price: true, images: true, slug: true },
+      });
+    }
   }
+
+  // Build base URL for category links (preserve other search params isn't needed here)
+  const baseHref = `/store/${shopSlug}`;
 
   return (
     <section className="max-w-7xl mx-auto px-6 py-16">
       {bool(p.heading) && (
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-slate-900">{str(p.heading)}</h2>
           <div className="brand-bg w-12 h-1 rounded-full mx-auto mt-3" />
         </div>
       )}
+
+      {/* Category filter pills */}
+      {categories.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-8 justify-center">
+          <a
+            href={baseHref}
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+              !categorySlug
+                ? "brand-bg text-white border-transparent"
+                : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+            }`}
+          >
+            All
+          </a>
+          {categories.map((cat) => (
+            <a
+              key={cat.id}
+              href={`${baseHref}?category=${cat.slug}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                categorySlug === cat.slug
+                  ? "brand-bg text-white border-transparent"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
+              }`}
+            >
+              {cat.name}
+            </a>
+          ))}
+        </div>
+      )}
+
       <div className={`grid ${colClass} gap-6`}>
         {products.length > 0
           ? products.map((product) => (
@@ -78,7 +137,7 @@ async function ProductGridBlock({ p, shopSlug }: { p: Record<string, unknown>; s
                   <a href={`/store/${shopSlug}/products/${product.slug}`} className="hover:text-indigo-600 transition-colors">
                     <p className="font-semibold text-slate-800 mb-1 line-clamp-2">{product.title}</p>
                   </a>
-                  <p className="brand-text font-bold text-lg mb-4">${Number(product.price).toFixed(2)}</p>
+                  <p className="brand-text font-bold text-lg mb-4">₹{Number(product.price).toFixed(2)}</p>
                   <AddToCartButton
                     shopSlug={shopSlug}
                     productId={product.id}
@@ -158,7 +217,7 @@ function CtaBlock({ p }: { p: Record<string, unknown> }) {
   );
 }
 
-export async function BlockRenderer({ blocks, shopSlug = "" }: { blocks: EditorBlock[]; shopSlug?: string }) {
+export async function BlockRenderer({ blocks, shopSlug = "", categorySlug }: { blocks: EditorBlock[]; shopSlug?: string; categorySlug?: string }) {
   if (blocks.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] text-slate-400">
@@ -173,7 +232,7 @@ export async function BlockRenderer({ blocks, shopSlug = "" }: { blocks: EditorB
         const p = block.props;
         switch (block.type) {
           case "hero":         return <HeroBlock key={block.id} p={p} />;
-          case "product-grid": return <ProductGridBlock key={block.id} p={p} shopSlug={shopSlug} />;
+          case "product-grid": return <ProductGridBlock key={block.id} p={p} shopSlug={shopSlug} categorySlug={categorySlug} />;
           case "banner":       return <BannerBlock key={block.id} p={p} />;
           case "text":         return <TextBlock key={block.id} p={p} />;
           case "image":        return <ImageBlock key={block.id} p={p} />;

@@ -64,7 +64,7 @@ export default async function OrdersPage() {
                   <td className="px-4 py-3 text-muted-foreground">
                     {order.items.length} {order.items.length === 1 ? "item" : "items"}
                   </td>
-                  <td className="px-4 py-3 font-medium">${Number(order.total).toFixed(2)}</td>
+                  <td className="px-4 py-3 font-medium">₹{Number(order.total).toFixed(2)}</td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[order.status]}`}>
                       {order.status}

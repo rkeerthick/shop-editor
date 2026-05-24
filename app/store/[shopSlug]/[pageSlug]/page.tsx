@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { BlockRenderer } from "@/components/storefront/block-renderer";
 import type { EditorBlock } from "@/types/blocks";
 import type { Metadata } from "next";
@@ -14,21 +14,32 @@ export async function generateMetadata({
   if (!shop) return {};
   const page = await db.storefrontPage.findFirst({
     where: { shopId: shop.id, slug: pageSlug },
-    select: { title: true, metaTitle: true, metaDescription: true },
+    select: { title: true, slug: true, isHome: true, metaTitle: true, metaDescription: true },
   });
   if (!page) return {};
+  if (page.isHome || page.slug === "home") return { title: page.metaTitle || shop.name };
+  const title = page.metaTitle || `${page.title} | ${shop.name}`;
+  const description = page.metaDescription || undefined;
   return {
-    title: page.metaTitle || `${page.title} | ${shop.name}`,
-    description: page.metaDescription || undefined,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: shop.name,
+    },
   };
 }
 
 export default async function StorefrontPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ shopSlug: string; pageSlug: string }>;
+  searchParams: Promise<{ category?: string }>;
 }) {
   const { shopSlug, pageSlug } = await params;
+  const { category } = await searchParams;
 
   const shop = await db.shop.findUnique({ where: { slug: shopSlug } });
   if (!shop) notFound();
@@ -39,6 +50,9 @@ export default async function StorefrontPage({
   });
   if (!page) notFound();
 
+  // Home page always lives at the root URL — redirect to avoid duplicate content
+  if (page.isHome || page.slug === "home") redirect(`/store/${shopSlug}`);
+
   const blocks: EditorBlock[] = page.blocks.map((b) => ({
     id: b.id,
     type: b.type as EditorBlock["type"],
@@ -47,5 +61,5 @@ export default async function StorefrontPage({
     isVisible: b.isVisible,
   }));
 
-  return <BlockRenderer blocks={blocks} shopSlug={shopSlug} />;
+  return <BlockRenderer blocks={blocks} shopSlug={shopSlug} categorySlug={category} />;
 }

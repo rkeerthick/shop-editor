@@ -16,10 +16,10 @@ export function CartIcon({ shopSlug }: { shopSlug: string }) {
   }, []);
 
   return (
-    <Link href={`/store/${shopSlug}/cart`} className="relative flex items-center">
+    <Link href={`/store/${shopSlug}/cart`} className="relative p-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center">
       <ShoppingCart className="h-5 w-5" />
       {count > 0 && (
-        <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+        <span className="absolute top-0.5 right-0.5 bg-slate-900 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
           {count > 9 ? "9+" : count}
         </span>
       )}

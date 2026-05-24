@@ -13,12 +13,18 @@ import { cn } from "@/lib/utils";
 import { createProductSchema, type CreateProductInput } from "@/lib/validations/product";
 import { ImageUpload } from "@/components/ui/image-upload";
 
+interface CategoryOption {
+  id: string;
+  name: string;
+}
+
 interface ProductFormProps {
   shopId: string;
+  categories?: CategoryOption[];
   defaultValues?: Partial<CreateProductInput> & { id?: string };
 }
 
-export function ProductForm({ shopId, defaultValues }: ProductFormProps) {
+export function ProductForm({ shopId, categories = [], defaultValues }: ProductFormProps) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const isEditing = !!defaultValues?.id;
@@ -88,18 +94,33 @@ export function ProductForm({ shopId, defaultValues }: ProductFormProps) {
           <Label htmlFor="description">Description</Label>
           <Textarea id="description" placeholder="Describe your product…" rows={4} {...register("description")} />
         </div>
+        {categories.length > 0 && (
+          <div className="space-y-1.5">
+            <Label htmlFor="categoryId">Category <span className="text-muted-foreground font-normal text-xs">optional</span></Label>
+            <select
+              id="categoryId"
+              {...register("categoryId")}
+              className="w-full border border-input rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">No category</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="bg-white border rounded-lg p-6 space-y-4">
         <h2 className="font-semibold">Pricing & inventory</h2>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label htmlFor="price">Price ($)</Label>
+            <Label htmlFor="price">Price (₹)</Label>
             <Input id="price" type="number" step="0.01" min="0" placeholder="0.00" {...register("price", { valueAsNumber: true })} />
             {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="comparePrice">Compare-at price ($) <span className="text-muted-foreground font-normal text-xs">optional</span></Label>
+            <Label htmlFor="comparePrice">Compare-at price (₹) <span className="text-muted-foreground font-normal text-xs">optional</span></Label>
             <Input id="comparePrice" type="number" step="0.01" min="0" placeholder="0.00" {...register("comparePrice", { valueAsNumber: true })} />
           </div>
         </div>

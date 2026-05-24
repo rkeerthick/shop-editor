@@ -46,7 +46,7 @@ export default function CartPage({ params }: { params: Promise<{ shopSlug: strin
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-medium truncate">{item.title}</p>
-              <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+              <p className="text-sm text-muted-foreground">₹{item.price.toFixed(2)} each</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -63,7 +63,7 @@ export default function CartPage({ params }: { params: Promise<{ shopSlug: strin
                 +
               </button>
             </div>
-            <p className="w-20 text-right font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+            <p className="w-20 text-right font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
             <button
               onClick={() => removeItem(item.productId, item.variantId)}
               className="text-muted-foreground hover:text-red-500 text-sm ml-2"
@@ -77,7 +77,7 @@ export default function CartPage({ params }: { params: Promise<{ shopSlug: strin
       <div className="border-t pt-6 flex flex-col items-end gap-4">
         <div className="flex gap-8 text-sm">
           <span className="text-muted-foreground">Subtotal</span>
-          <span className="font-semibold text-lg">${subtotal.toFixed(2)}</span>
+          <span className="font-semibold text-lg">₹{subtotal.toFixed(2)}</span>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={() => clearCart()}>Clear Cart</Button>

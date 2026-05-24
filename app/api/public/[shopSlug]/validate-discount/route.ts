@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ sho
   if (discount.minOrder !== null && Number(subtotal) < Number(discount.minOrder)) {
     return NextResponse.json({
       data: null,
-      error: `Minimum order of $${Number(discount.minOrder).toFixed(2)} required`,
+      error: `Minimum order of ₹${Number(discount.minOrder).toFixed(2)} required`,
     }, { status: 400 });
   }
 

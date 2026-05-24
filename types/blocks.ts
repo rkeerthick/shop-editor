@@ -31,7 +31,7 @@ export const BLOCK_DEFAULTS: Record<BlockType, Record<string, unknown>> = {
     limit: 6,
   },
   banner: {
-    text: "Free shipping on orders over $50",
+    text: "Free shipping on orders over ₹50",
     backgroundColor: "#1a1a1a",
     textColor: "#ffffff",
     link: "",

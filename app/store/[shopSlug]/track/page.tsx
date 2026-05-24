@@ -116,7 +116,7 @@ export default async function TrackPage({
                     <p className="text-sm font-medium text-slate-800">{item.product.title}</p>
                     <p className="text-xs text-slate-400">Qty: {item.quantity}</p>
                   </div>
-                  <p className="text-sm font-semibold text-slate-700">${(Number(item.unitPrice) * item.quantity).toFixed(2)}</p>
+                  <p className="text-sm font-semibold text-slate-700">₹{(Number(item.unitPrice) * item.quantity).toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -124,12 +124,12 @@ export default async function TrackPage({
               {Number(order.discountAmount) > 0 && (
                 <div className="flex justify-between text-sm text-green-600">
                   <span>Discount</span>
-                  <span>−${Number(order.discountAmount).toFixed(2)}</span>
+                  <span>−₹{Number(order.discountAmount).toFixed(2)}</span>
                 </div>
               )}
               <div className="flex justify-between font-bold text-slate-900">
                 <span>Total</span>
-                <span>${Number(order.total).toFixed(2)}</span>
+                <span>₹{Number(order.total).toFixed(2)}</span>
               </div>
             </div>
           </div>

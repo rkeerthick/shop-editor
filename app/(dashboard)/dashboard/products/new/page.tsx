@@ -13,10 +13,16 @@ export default async function NewProductPage() {
   const shop = await db.shop.findFirst({ where: { ownerId: session.user.id } });
   if (!shop) redirect("/dashboard/setup");
 
+  const categories = await db.category.findMany({
+    where: { shopId: shop.id },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Add product</h1>
-      <ProductForm shopId={shop.id} />
+      <ProductForm shopId={shop.id} categories={categories} />
     </div>
   );
 }

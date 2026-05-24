@@ -32,6 +32,13 @@ interface DiscountResult {
   discountAmount: number;
 }
 
+interface ShippingRate {
+  id: string;
+  name: string;
+  price: number;
+  estimatedDays: string | null;
+}
+
 function PayForm({ shopSlug, clientSecret, orderId }: { shopSlug: string; clientSecret: string; orderId: string }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -83,11 +90,27 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
   const [discountError, setDiscountError] = useState("");
   const [applyingDiscount, setApplyingDiscount] = useState(false);
 
-  useEffect(() => setHydrated(true), []);
+  const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
+  const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
+
+  useEffect(() => { setHydrated(true); }, []);
+
+  useEffect(() => {
+    fetch(`/api/public/${shopSlug}/shipping-rates`)
+      .then((r) => r.json())
+      .then(({ data }) => {
+        if (data?.length) {
+          setShippingRates(data);
+          setSelectedRateId(data[0].id);
+        }
+      });
+  }, [shopSlug]);
 
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const discountAmount = discountResult?.discountAmount ?? 0;
-  const total = Math.max(0, subtotal - discountAmount);
+  const selectedRate = shippingRates.find((r) => r.id === selectedRateId) ?? null;
+  const shippingAmount = selectedRate ? Number(selectedRate.price) : 0;
+  const total = Math.max(0, subtotal - discountAmount + shippingAmount);
 
   async function applyDiscount() {
     if (!discountInput.trim()) return;
@@ -127,6 +150,8 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
         items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, quantity: i.quantity })),
         discountCodeId: discountResult?.id ?? null,
         discountAmount,
+        shippingRateId: selectedRateId ?? null,
+        shippingAmount,
       }),
     });
 
@@ -162,10 +187,40 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
           {items.map((item) => (
             <div key={`${item.productId}:${item.variantId ?? ""}`} className="flex justify-between text-sm">
               <span className="text-muted-foreground">{item.title} × {item.quantity}</span>
-              <span>${(item.price * item.quantity).toFixed(2)}</span>
+              <span>₹{(item.price * item.quantity).toFixed(2)}</span>
             </div>
           ))}
         </div>
+
+        {/* Shipping rate selector */}
+        {shippingRates.length > 0 && !clientSecret && (
+          <div className="border-t pt-4 mb-4">
+            <p className="text-sm font-medium mb-2">Shipping</p>
+            <div className="space-y-2">
+              {shippingRates.map((rate) => (
+                <label key={rate.id} className={`flex items-center justify-between gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${selectedRateId === rate.id ? "border-slate-900 bg-slate-50" : "hover:bg-slate-50"}`}>
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name="shipping-rate"
+                      value={rate.id}
+                      checked={selectedRateId === rate.id}
+                      onChange={() => setSelectedRateId(rate.id)}
+                      className="accent-slate-900"
+                    />
+                    <div>
+                      <p className="text-sm font-medium">{rate.name}</p>
+                      {rate.estimatedDays && <p className="text-xs text-muted-foreground">{rate.estimatedDays}</p>}
+                    </div>
+                  </div>
+                  <span className="text-sm font-semibold">
+                    {Number(rate.price) === 0 ? "Free" : `₹${Number(rate.price).toFixed(2)}`}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Discount code input */}
         {!clientSecret && (
@@ -197,17 +252,23 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
         <div className="border-t pt-3 space-y-2">
           <div className="flex justify-between text-sm text-muted-foreground">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>₹{subtotal.toFixed(2)}</span>
           </div>
           {discountAmount > 0 && (
             <div className="flex justify-between text-sm text-green-600">
               <span>Discount ({discountResult?.code})</span>
-              <span>−${discountAmount.toFixed(2)}</span>
+              <span>−₹{discountAmount.toFixed(2)}</span>
+            </div>
+          )}
+          {selectedRate && (
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>Shipping ({selectedRate.name})</span>
+              <span>{shippingAmount === 0 ? "Free" : `₹${shippingAmount.toFixed(2)}`}</span>
             </div>
           )}
           <div className="flex justify-between font-semibold pt-1 border-t">
             <span>Total</span>
-            <span>${total.toFixed(2)}</span>
+            <span>₹{total.toFixed(2)}</span>
           </div>
         </div>
       </div>

@@ -3,11 +3,8 @@ import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { ProductsTable } from "@/components/dashboard/products-table";
 
 export default async function ProductsPage() {
   const session = await auth();
@@ -18,6 +15,10 @@ export default async function ProductsPage() {
 
   const products = await db.product.findMany({
     where: { shopId: shop.id },
+    include: {
+      category: { select: { name: true } },
+      variants: { select: { id: true, name: true, price: true, stock: true, sku: true }, orderBy: { createdAt: "asc" } },
+    },
     orderBy: { createdAt: "desc" },
   });
 
@@ -41,38 +42,23 @@ export default async function ProductsPage() {
           </Link>
         </div>
       ) : (
-        <div className="border rounded-lg bg-white overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.title}</TableCell>
-                  <TableCell>${Number(p.price).toFixed(2)}</TableCell>
-                  <TableCell>{p.stock}</TableCell>
-                  <TableCell>
-                    <Badge variant={p.isActive ? "default" : "secondary"}>
-                      {p.isActive ? "Active" : "Draft"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Link href={`/dashboard/products/${p.id}/edit`} className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
-                      Edit
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ProductsTable
+          products={products.map((p) => ({
+            id: p.id,
+            title: p.title,
+            price: Number(p.price),
+            stock: p.stock,
+            isActive: p.isActive,
+            category: p.category?.name ?? null,
+            variants: p.variants.map((v) => ({
+              id: v.id,
+              name: v.name,
+              price: Number(v.price),
+              stock: v.stock,
+              sku: v.sku,
+            })),
+          }))}
+        />
       )}
     </div>
   );

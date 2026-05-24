@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { CartIcon } from "@/components/storefront/cart-icon";
 import { SearchBar } from "@/components/storefront/search-bar";
+import { MobileMenu } from "@/components/storefront/mobile-menu";
+import { AccountIcon } from "@/components/storefront/account-icon";
 
 const FONTS: Record<string, string> = {
   modern:  "'Inter', system-ui, -apple-system, sans-serif",
@@ -67,33 +69,45 @@ export default async function StoreLayout({
       `}</style>
 
       <header className="bg-white border-b border-slate-100 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a
-            href={`/store/${shopSlug}`}
-            className="font-bold text-xl text-slate-900 shrink-0 tracking-tight transition-opacity hover:opacity-75"
-          >
-            {shop.name}
-          </a>
-          <div className="flex items-center gap-8">
-            <nav className="hidden sm:flex items-center gap-6 text-sm">
-              {pages.map((page) => (
-                <a
-                  key={page.slug}
-                  href={page.isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${page.slug}`}
-                  className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
-                >
-                  {page.title}
-                </a>
-              ))}
-            </nav>
-            <div className="flex items-center gap-4">
-              <a href={`/store/${shopSlug}/track`} className="hidden sm:block text-sm text-slate-400 hover:text-slate-700 transition-colors">
-                Track order
-              </a>
-              <SearchBar shopSlug={shopSlug} />
-              <CartIcon shopSlug={shopSlug} />
-            </div>
+        <div className="max-w-7xl mx-auto px-6 h-17 flex items-center justify-between gap-6">
+
+          {/* Left: hamburger (mobile only) + logo */}
+          <div className="flex items-center gap-3 shrink-0">
+            <MobileMenu shopSlug={shopSlug} pages={pages} />
+            <a
+              href={`/store/${shopSlug}`}
+              className="font-bold text-lg text-slate-900 tracking-tight hover:opacity-70 transition-opacity"
+            >
+              {shop.name}
+            </a>
           </div>
+
+          {/* Centre: desktop nav */}
+          <nav className="hidden md:flex items-center gap-7 text-sm flex-1">
+            {pages.map((page) => (
+              <a
+                key={page.slug}
+                href={page.isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${page.slug}`}
+                className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
+              >
+                {page.title}
+              </a>
+            ))}
+            <a
+              href={`/store/${shopSlug}/track`}
+              className="text-slate-500 hover:text-slate-900 whitespace-nowrap transition-colors font-medium"
+            >
+              Track order
+            </a>
+          </nav>
+
+          {/* Right: icon cluster */}
+          <div className="flex items-center gap-1">
+            <SearchBar shopSlug={shopSlug} />
+            <AccountIcon shopSlug={shopSlug} />
+            <CartIcon shopSlug={shopSlug} />
+          </div>
+
         </div>
       </header>
 

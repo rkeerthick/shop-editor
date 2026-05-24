@@ -1,6 +1,20 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/storefront/add-to-cart-button";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  params: Promise<{ shopSlug: string }>;
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
+  const { q } = await searchParams;
+  return {
+    title: q ? `Search: "${q}"` : "Search",
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function SearchPage({
   params,
@@ -66,7 +80,7 @@ export default async function SearchPage({
                 <a href={`/store/${shopSlug}/products/${product.slug}`} className="hover:underline">
                   <p className="font-medium text-sm">{product.title}</p>
                 </a>
-                <p className="text-muted-foreground text-sm mb-3">${Number(product.price).toFixed(2)}</p>
+                <p className="text-muted-foreground text-sm mb-3">₹{Number(product.price).toFixed(2)}</p>
                 <AddToCartButton
                   shopSlug={shopSlug}
                   productId={product.id}

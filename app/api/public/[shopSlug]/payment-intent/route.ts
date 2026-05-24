@@ -22,6 +22,8 @@ const schema = z.object({
   })).min(1),
   discountCodeId: z.string().nullable().optional(),
   discountAmount: z.number().min(0).optional(),
+  shippingRateId: z.string().nullable().optional(),
+  shippingAmount: z.number().min(0).optional(),
 });
 
 export async function POST(req: Request, { params }: { params: Promise<{ shopSlug: string }> }) {
@@ -31,7 +33,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ shopSlu
     const parsed = schema.safeParse(body);
     if (!parsed.success) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
-    const { customer: customerInput, items: cartItems, discountCodeId, discountAmount: clientDiscountAmount } = parsed.data;
+    const { customer: customerInput, items: cartItems, discountCodeId, discountAmount: clientDiscountAmount, shippingRateId, shippingAmount: clientShippingAmount } = parsed.data;
 
     const shop = await db.shop.findUnique({ where: { slug: shopSlug } });
     if (!shop || !shop.isActive) return NextResponse.json({ error: "Shop not found" }, { status: 404 });
@@ -92,7 +94,27 @@ export async function POST(req: Request, { params }: { params: Promise<{ shopSlu
       resolvedDiscountCodeId = null;
     }
 
-    const total = Math.max(0, subtotal - verifiedDiscountAmount);
+    // Server-side shipping validation
+    let verifiedShippingAmount = 0;
+    let verifiedShippingRateName: string | null = null;
+
+    if (shippingRateId) {
+      const rate = await db.shippingRate.findFirst({
+        where: { id: shippingRateId, shopId: shop.id, isActive: true },
+      });
+      if (rate) {
+        verifiedShippingAmount = Number(rate.price);
+        verifiedShippingRateName = rate.name;
+      }
+    }
+
+    // Sanity-check client didn't manipulate shipping
+    if (clientShippingAmount !== undefined && Math.abs(clientShippingAmount - verifiedShippingAmount) > 0.01) {
+      verifiedShippingAmount = 0;
+      verifiedShippingRateName = null;
+    }
+
+    const total = Math.max(0, subtotal - verifiedDiscountAmount + verifiedShippingAmount);
 
     // Upsert customer
     const customer = await db.customer.upsert({
@@ -107,6 +129,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ shopSlu
         customerId: customer.id,
         subtotal,
         discountAmount: verifiedDiscountAmount,
+        shippingAmount: verifiedShippingAmount,
+        shippingRateName: verifiedShippingRateName,
         total,
         discountCodeId: resolvedDiscountCodeId,
         shippingAddress: customerInput.address,
@@ -132,8 +156,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ shopSlu
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.max(50, Math.round(total * 100)), // Stripe minimum $0.50
-      currency: "usd",
+      amount: Math.max(50, Math.round(total * 100)),
+      currency: "inr",
       metadata: { orderId: order.id, shopId: shop.id },
       automatic_payment_methods: { enabled: true },
     });

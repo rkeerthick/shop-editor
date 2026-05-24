@@ -42,6 +42,10 @@ yarn-error.log*
 # local dev notes (contains sensitive info)
 DEV_NOTES.md
 
+# local project docs (not for repo)
+PROJECT_FLOW.md
+PROJECT_OVERVIEW.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

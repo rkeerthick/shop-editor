@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
-import { Package, ShoppingCart, DollarSign, TrendingUp } from "lucide-react";
+import { Package, ShoppingCart, IndianRupee, TrendingUp } from "lucide-react";
 
 function getDaysAgo(days: number) {
   const d = new Date();
@@ -88,9 +88,9 @@ export default async function AnalyticsPage() {
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
         <KpiCard
           label="Revenue (30d)"
-          value={`$${currentRevenue.toFixed(2)}`}
+          value={`₹${currentRevenue.toFixed(2)}`}
           delta={revenueDelta}
-          icon={DollarSign}
+          icon={IndianRupee}
           color="indigo"
         />
         <KpiCard
@@ -102,7 +102,7 @@ export default async function AnalyticsPage() {
         />
         <KpiCard
           label="Avg. Order Value"
-          value={orders.length > 0 ? `$${(currentRevenue / orders.length).toFixed(2)}` : "—"}
+          value={orders.length > 0 ? `₹${(currentRevenue / orders.length).toFixed(2)}` : "—"}
           icon={TrendingUp}
           color="sky"
         />
@@ -144,7 +144,7 @@ export default async function AnalyticsPage() {
                       <p className="text-sm font-medium text-slate-800 truncate">{product?.title ?? "Unknown"}</p>
                       <p className="text-xs text-slate-400">{p._count.productId} sold</p>
                     </div>
-                    <span className="text-sm font-semibold text-indigo-600">${revenue.toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-indigo-600">₹{revenue.toFixed(2)}</span>
                   </div>
                 );
               })}
@@ -170,7 +170,7 @@ export default async function AnalyticsPage() {
                     <p className="text-xs text-slate-400">{new Date(o.createdAt).toLocaleDateString()}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-slate-800">${Number(o.total).toFixed(2)}</p>
+                    <p className="text-sm font-semibold text-slate-800">₹{Number(o.total).toFixed(2)}</p>
                     <StatusBadge status={o.status} />
                   </div>
                 </a>

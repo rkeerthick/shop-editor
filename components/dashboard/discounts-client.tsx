@@ -101,11 +101,11 @@ export function DiscountsClient({ shopId, initialCodes }: { shopId: string; init
                 onChange={(e) => setForm((f) => ({ ...f, type: e.target.value as "PERCENTAGE" | "FIXED" }))}
               >
                 <option value="PERCENTAGE">Percentage (%)</option>
-                <option value="FIXED">Fixed amount ($)</option>
+                <option value="FIXED">Fixed amount (₹)</option>
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium">Value * {form.type === "PERCENTAGE" ? "(%)" : "($)"}</label>
+              <label className="text-sm font-medium">Value * {form.type === "PERCENTAGE" ? "(%)" : "(₹)"}</label>
               <input
                 type="number"
                 className="w-full border rounded px-3 py-2 text-sm mt-1"
@@ -115,7 +115,7 @@ export function DiscountsClient({ shopId, initialCodes }: { shopId: string; init
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Min. order amount ($)</label>
+              <label className="text-sm font-medium">Min. order amount (₹)</label>
               <input
                 type="number"
                 className="w-full border rounded px-3 py-2 text-sm mt-1"
@@ -173,10 +173,10 @@ export function DiscountsClient({ shopId, initialCodes }: { shopId: string; init
                 <tr key={c.id}>
                   <td className="px-4 py-3 font-mono font-medium">{c.code}</td>
                   <td className="px-4 py-3">
-                    {c.type === "PERCENTAGE" ? `${c.value}%` : `$${c.value.toFixed(2)}`}
+                    {c.type === "PERCENTAGE" ? `${c.value}%` : `₹${c.value.toFixed(2)}`}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
-                    {c.minOrder ? `$${c.minOrder.toFixed(2)}` : "—"}
+                    {c.minOrder ? `₹${c.minOrder.toFixed(2)}` : "—"}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {c.usageCount}{c.usageLimit ? ` / ${c.usageLimit}` : ""}
