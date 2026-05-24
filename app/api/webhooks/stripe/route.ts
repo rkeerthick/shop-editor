@@ -77,6 +77,12 @@ export async function POST(req: Request) {
       }).catch((err) => console.error("[new-order-alert]", err));
     }
 
+    // Mark abandoned cart as converted
+    await db.abandonedCart.updateMany({
+      where: { shopId: order.shopId, email: order.customer.email, convertedAt: null },
+      data: { convertedAt: new Date() },
+    }).catch((err) => console.error("[abandoned-cart-convert]", err));
+
     // Check for low stock and alert merchant
     const updatedProducts = await db.product.findMany({
       where: {

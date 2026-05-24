@@ -93,13 +93,14 @@ model Shop {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner    User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  products Product[]
-  orders   Order[]
-  pages    StorefrontPage[]
-  discountCodes DiscountCode[]
-  categories    Category[]
-  shippingRates ShippingRate[]
+  owner          User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products       Product[]
+  orders         Order[]
+  pages          StorefrontPage[]
+  discountCodes  DiscountCode[]
+  categories     Category[]
+  shippingRates  ShippingRate[]
+  abandonedCarts AbandonedCart[]
 }
 
 model Category {
@@ -199,6 +200,23 @@ model CustomerAccount {
   name         String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+model AbandonedCart {
+  id             String    @id @default(cuid())
+  shopId         String
+  email          String
+  name           String?
+  cartItems      Json
+  recoveryToken  String    @unique @default(cuid())
+  reminderSentAt DateTime?
+  convertedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, email])
 }
 
 model Order {

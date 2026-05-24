@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useCallback } from "react";
 import { useCartStore } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { loadStripe } from "@stripe/stripe-js";
@@ -76,7 +76,7 @@ function PayForm({ shopSlug, clientSecret, orderId }: { shopSlug: string; client
 export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: string }> }) {
   const { shopSlug } = use(params);
   const [hydrated, setHydrated] = useState(false);
-  const { items } = useCartStore();
+  const { items, restoreCart } = useCartStore();
   const [form, setForm] = useState<CustomerForm>({
     name: "", email: "", line1: "", city: "", state: "", postal_code: "", country: "US",
   });
@@ -95,6 +95,25 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
 
   useEffect(() => { setHydrated(true); }, []);
 
+  // Restore cart from recovery token in URL
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get("recover");
+    if (!token) return;
+    fetch(`/api/public/${shopSlug}/abandoned-cart?token=${token}`)
+      .then((r) => r.json())
+      .then(({ data }) => {
+        if (!data) return;
+        restoreCart(shopSlug, data.cartItems);
+        setForm((f) => ({
+          ...f,
+          email: data.email ?? f.email,
+          name: data.name ?? f.name,
+        }));
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shopSlug]);
+
   useEffect(() => {
     fetch(`/api/public/${shopSlug}/shipping-rates`)
       .then((r) => r.json())
@@ -111,6 +130,16 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
   const selectedRate = shippingRates.find((r) => r.id === selectedRateId) ?? null;
   const shippingAmount = selectedRate ? Number(selectedRate.price) : 0;
   const total = Math.max(0, subtotal - discountAmount + shippingAmount);
+
+  const saveAbandonedCart = useCallback(async (email: string) => {
+    if (!email || items.length === 0) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+    fetch(`/api/public/${shopSlug}/abandoned-cart`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, name: form.name || undefined, cartItems: items }),
+    }).catch(() => {});
+  }, [shopSlug, items, form.name]);
 
   async function applyDiscount() {
     if (!discountInput.trim()) return;
@@ -280,7 +309,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
             <h2 className="text-lg font-semibold mb-4">Contact & Shipping</h2>
             <form onSubmit={handleSubmit} className="space-y-3">
               <input required placeholder="Full name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
-              <input required type="email" placeholder="Email address" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
+              <input required type="email" placeholder="Email address" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} onBlur={(e) => saveAbandonedCart(e.target.value)} className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
               <input required placeholder="Address line 1" value={form.line1} onChange={(e) => setForm((f) => ({ ...f, line1: e.target.value }))} className="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />
               <div className="grid grid-cols-2 gap-3">
                 <input required placeholder="City" value={form.city} onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))} className="border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900" />

@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import type { CartItem } from "@/store/cart";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -218,5 +219,108 @@ export async function sendOrderConfirmation({
     subject: `Order confirmed — ${shopName}`,
     html,
     text: `Hi ${customerName},\n\nThanks for your order at ${shopName}!\n\nOrder ID: ${orderId}\n\nItems:\n${itemLines}\n\n${discountLine}Total: ₹${total.toFixed(2)}\n\n— ${shopName}`,
+  });
+}
+
+export async function sendAbandonedCartEmail({
+  customerEmail,
+  customerName,
+  shopName,
+  cartItems,
+  recoveryUrl,
+}: {
+  customerEmail: string;
+  customerName?: string;
+  shopName: string;
+  cartItems: CartItem[];
+  recoveryUrl: string;
+}) {
+  if (!process.env.RESEND_API_KEY) return;
+
+  const greeting = customerName ? `Hi ${customerName},` : "Hi there,";
+  const itemRows = cartItems
+    .map(
+      (i) => `
+      <tr>
+        <td style="padding:12px 0;color:#334155;font-size:14px;border-bottom:1px solid #f1f5f9;">
+          ${i.title} <span style="color:#94a3b8;">× ${i.quantity}</span>
+        </td>
+        <td style="padding:12px 0;color:#334155;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #f1f5f9;">
+          ₹${(i.price * i.quantity).toFixed(2)}
+        </td>
+      </tr>`
+    )
+    .join("");
+
+  const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
+  const itemText = cartItems.map((i) => `  ${i.title} × ${i.quantity}  ₹${(i.price * i.quantity).toFixed(2)}`).join("\n");
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.06);">
+
+        <tr>
+          <td style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:36px 40px;text-align:center;">
+            <p style="margin:0;color:#fef3c7;font-size:32px;">🛒</p>
+            <h1 style="margin:12px 0 0;color:#ffffff;font-size:22px;font-weight:700;">You left something behind</h1>
+            <p style="margin:8px 0 0;color:#fde68a;font-size:14px;">${shopName}</p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:36px 40px;">
+            <p style="margin:0 0 6px;color:#334155;font-size:16px;font-weight:600;">${greeting}</p>
+            <p style="margin:0 0 28px;color:#64748b;font-size:14px;line-height:1.6;">
+              You left some items in your cart. They&apos;re still waiting for you — complete your purchase before they sell out!
+            </p>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+              <tr>
+                <td colspan="2" style="border-bottom:2px solid #e2e8f0;padding-bottom:10px;">
+                  <p style="margin:0;color:#1e293b;font-size:14px;font-weight:600;">Your cart</p>
+                </td>
+              </tr>
+              ${itemRows}
+              <tr>
+                <td style="padding:14px 0 0;color:#1e293b;font-size:15px;font-weight:700;">Subtotal</td>
+                <td style="padding:14px 0 0;color:#d97706;font-size:16px;font-weight:700;text-align:right;">₹${subtotal.toFixed(2)}</td>
+              </tr>
+            </table>
+
+            <div style="text-align:center;">
+              <a href="${recoveryUrl}" style="display:inline-block;background:#d97706;color:#ffffff;text-decoration:none;padding:14px 40px;border-radius:10px;font-size:15px;font-weight:700;letter-spacing:-0.2px;">
+                Complete My Purchase →
+              </a>
+            </div>
+
+            <p style="margin:28px 0 0;color:#94a3b8;font-size:12px;text-align:center;line-height:1.6;">
+              If you didn&apos;t intend to shop, you can ignore this email.
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#f8fafc;padding:20px 40px;text-align:center;border-top:1px solid #e2e8f0;">
+            <p style="margin:0;color:#94a3b8;font-size:12px;">© ${new Date().getFullYear()} ${shopName}. Powered by Shop Editor.</p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  await resend.emails.send({
+    from: "Shop Editor <onboarding@resend.dev>",
+    to: customerEmail,
+    subject: `You left something in your cart — ${shopName}`,
+    html,
+    text: `${greeting}\n\nYou left some items in your cart at ${shopName}:\n\n${itemText}\n\nSubtotal: ₹${subtotal.toFixed(2)}\n\nComplete your purchase: ${recoveryUrl}\n\n— ${shopName}`,
   });
 }

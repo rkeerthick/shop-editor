@@ -17,6 +17,7 @@ interface CartState {
   removeItem: (productId: string, variantId?: string) => void;
   updateQty: (productId: string, variantId: string | undefined, qty: number) => void;
   clearCart: () => void;
+  restoreCart: (shopSlug: string, items: CartItem[]) => void;
 }
 
 function itemKey(productId: string, variantId?: string) {
@@ -65,6 +66,9 @@ export const useCartStore = create<CartState>()(
       },
       clearCart() {
         set({ shopSlug: null, items: [] });
+      },
+      restoreCart(shopSlug, items) {
+        set({ shopSlug, items });
       },
     }),
     { name: "shop-cart" }
