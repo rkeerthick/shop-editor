@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, use, useCallback } from "react";
+import { useFeatureFlagVariantKey } from "posthog-js/react";
 import { useCartStore } from "@/store/cart";
 import { Button } from "@/components/ui/button";
 import { loadStripe } from "@stripe/stripe-js";
@@ -92,6 +93,9 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
 
   const [shippingRates, setShippingRates] = useState<ShippingRate[]>([]);
   const [selectedRateId, setSelectedRateId] = useState<string | null>(null);
+
+  const btnVariant = useFeatureFlagVariantKey("checkout-button-text");
+  const checkoutBtnLabel = btnVariant === "buy-now" ? "Buy Now" : btnVariant === "complete-order" ? "Complete Order" : "Continue to Payment";
 
   useEffect(() => { setHydrated(true); }, []);
 
@@ -321,7 +325,7 @@ export default function CheckoutPage({ params }: { params: Promise<{ shopSlug: s
               </div>
               {formError && <p className="text-sm text-red-600">{formError}</p>}
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Loading…" : "Continue to Payment"}
+                {loading ? "Loading…" : checkoutBtnLabel}
               </Button>
             </form>
           </>

@@ -5,6 +5,8 @@ import { SearchBar } from "@/components/storefront/search-bar";
 import { MobileMenu } from "@/components/storefront/mobile-menu";
 import { AccountIcon } from "@/components/storefront/account-icon";
 import Script from "next/script";
+import { PostHogProvider } from "@/components/posthog-provider";
+import { Suspense } from "react";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
@@ -133,7 +135,11 @@ export default async function StoreLayout({
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <Suspense>
+        <PostHogProvider>
+          <main className="flex-1">{children}</main>
+        </PostHogProvider>
+      </Suspense>
 
       <footer className="border-t border-slate-100 bg-slate-50 py-10">
         <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-slate-400">
