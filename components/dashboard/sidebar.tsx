@@ -33,7 +33,7 @@ export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
 
   return (
     <aside
-      className={`bg-slate-900 hidden md:flex flex-col py-5 shrink-0 shadow-xl transition-all duration-300 ${
+      className={`bg-slate-900 hidden md:flex flex-col py-5 shrink-0 shadow-xl transition-all duration-300 sticky top-0 h-screen ${
         collapsed ? "w-17 px-2" : "w-64 px-3"
       }`}
     >
@@ -83,7 +83,7 @@ export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
       )}
 
       {/* Nav */}
-      <nav className="flex flex-col gap-0.5 flex-1">
+      <nav className="flex flex-col gap-0.5 flex-1 overflow-y-auto scrollbar-none">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
           return (
