@@ -29,7 +29,7 @@ export async function GET(req: Request) {
         customerEmail: cart.email,
         customerName: cart.name ?? undefined,
         shopName: cart.shop.name,
-        cartItems: cart.cartItems as CartItem[],
+        cartItems: cart.cartItems as unknown as CartItem[],
         recoveryUrl,
       });
       await db.abandonedCart.update({

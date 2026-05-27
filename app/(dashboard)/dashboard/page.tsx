@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { Package, ShoppingCart, IndianRupee, TrendingUp } from "lucide-react";
+import { Package, ShoppingCart, IndianRupee, TrendingUp, Paintbrush, Tag } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -38,14 +38,14 @@ export default async function DashboardPage() {
           label="Revenue"
           value={`₹${revenue.toFixed(2)}`}
           icon={IndianRupee}
-          color="indigo"
+          color="teal"
           sub="from paid orders"
         />
         <StatCard
           label="Total Orders"
           value={String(orderCount)}
           icon={ShoppingCart}
-          color="violet"
+          color="amber"
           sub={`${pendingCount} pending`}
         />
         <StatCard
@@ -70,19 +70,19 @@ export default async function DashboardPage() {
           href="/dashboard/products/new"
           title="Add a product"
           description="List a new item in your store catalog"
-          emoji="📦"
+          icon={Package}
         />
         <QuickAction
           href="/dashboard/storefront"
           title="Edit storefront"
           description="Customize your public-facing store pages"
-          emoji="🎨"
+          icon={Paintbrush}
         />
         <QuickAction
           href="/dashboard/discounts"
           title="Create discount"
           description="Run a promotion with a coupon code"
-          emoji="🏷️"
+          icon={Tag}
         />
       </div>
     </div>
@@ -90,10 +90,10 @@ export default async function DashboardPage() {
 }
 
 const colorMap = {
-  indigo: { bg: "bg-indigo-50", icon: "bg-indigo-600", text: "text-indigo-600" },
-  violet: { bg: "bg-violet-50", icon: "bg-violet-600", text: "text-violet-600" },
-  sky:    { bg: "bg-sky-50",    icon: "bg-sky-600",    text: "text-sky-600"    },
-  emerald:{ bg: "bg-emerald-50",icon: "bg-emerald-600",text: "text-emerald-600"},
+  teal:   { bg: "bg-teal-50",   icon: "bg-emerald-700", text: "text-emerald-700" },
+  amber:  { bg: "bg-amber-50",  icon: "bg-amber-500",   text: "text-amber-600"   },
+  sky:    { bg: "bg-sky-50",    icon: "bg-sky-600",     text: "text-sky-600"     },
+  emerald:{ bg: "bg-emerald-50",icon: "bg-emerald-600", text: "text-emerald-600" },
 };
 
 function StatCard({
@@ -121,21 +121,23 @@ function StatCard({
 }
 
 function QuickAction({
-  href, title, description, emoji,
+  href, title, description, icon: Icon,
 }: {
   href: string;
   title: string;
   description: string;
-  emoji: string;
+  icon: React.ElementType;
 }) {
   return (
     <a
       href={href}
-      className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all group"
+      className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all group flex flex-col gap-2"
     >
-      <span className="text-2xl mb-3 block">{emoji}</span>
-      <p className="font-semibold text-slate-800 group-hover:text-indigo-600 transition-colors">{title}</p>
-      <p className="text-sm text-slate-400 mt-1">{description}</p>
+      <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-1">
+        <Icon className="w-5 h-5" />
+      </div>
+      <p className="font-semibold text-slate-800 group-hover:text-emerald-700 transition-colors">{title}</p>
+      <p className="text-sm text-slate-400">{description}</p>
     </a>
   );
 }

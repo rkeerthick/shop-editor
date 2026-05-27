@@ -34,21 +34,21 @@ export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
   return (
     <aside
       className={`bg-slate-900 flex flex-col py-5 shrink-0 shadow-xl transition-all duration-300 ${
-        collapsed ? "w-[68px] px-2" : "w-64 px-3"
+        collapsed ? "w-17 px-2" : "w-64 px-3"
       }`}
     >
       {/* Logo + collapse toggle */}
       <div className={`flex items-center mb-6 ${collapsed ? "justify-center" : "justify-between px-1"}`}>
         {!collapsed && (
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center shrink-0">
               <Store className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-white text-base tracking-tight">Shop Editor</span>
           </div>
         )}
         {collapsed && (
-          <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center">
             <Store className="w-4 h-4 text-white" />
           </div>
         )}
@@ -95,7 +95,7 @@ export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
                 collapsed ? "justify-center px-0 py-2.5" : "px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-indigo-600 text-white shadow-sm"
+                  ? "bg-emerald-700 text-white shadow-sm"
                   : "text-slate-400 hover:bg-slate-800 hover:text-white"
               }`}
             >
