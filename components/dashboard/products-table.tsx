@@ -111,8 +111,8 @@ export function ProductsTable({ products }: { products: Product[] }) {
                 {isOpen && p.variants.map((v, i) => (
                   <tr
                     key={v.id}
-                    className={`border-b border-slate-100 bg-indigo-50/40 transition-colors hover:bg-indigo-50/70 ${
-                      i === p.variants.length - 1 ? "border-b-2 border-indigo-100" : ""
+                    className={`border-b border-slate-100 bg-emerald-50/40 transition-colors hover:bg-emerald-50/70 ${
+                      i === p.variants.length - 1 ? "border-b-2 border-emerald-100" : ""
                     }`}
                   >
                     {/* Indent marker */}

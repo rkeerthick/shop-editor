@@ -72,7 +72,7 @@ export function ReviewsModerationClient({
             onClick={() => setFilter(f)}
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors border ${
               filter === f
-                ? "bg-indigo-600 text-white border-transparent"
+                ? "bg-emerald-700 text-white border-transparent"
                 : "bg-white text-slate-600 border-slate-200 hover:border-slate-400"
             }`}
           >

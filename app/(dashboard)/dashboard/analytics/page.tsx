@@ -144,7 +144,7 @@ export default async function AnalyticsPage() {
                       <p className="text-sm font-medium text-slate-800 truncate">{product?.title ?? "Unknown"}</p>
                       <p className="text-xs text-slate-400">{p._count.productId} sold</p>
                     </div>
-                    <span className="text-sm font-semibold text-indigo-600">₹{revenue.toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-emerald-700">₹{revenue.toFixed(2)}</span>
                   </div>
                 );
               })}
@@ -184,8 +184,8 @@ export default async function AnalyticsPage() {
 }
 
 const colorMap = {
-  indigo:  { icon: "bg-indigo-600" },
-  violet:  { icon: "bg-violet-600" },
+  indigo:  { icon: "bg-emerald-700" },
+  violet:  { icon: "bg-amber-500" },
   sky:     { icon: "bg-sky-600" },
   emerald: { icon: "bg-emerald-600" },
 };
@@ -215,8 +215,8 @@ function KpiCard({ label, value, delta, icon: Icon, color }: {
 const statusColors: Record<string, string> = {
   PENDING:    "text-amber-600",
   PAID:       "text-emerald-600",
-  PROCESSING: "text-blue-600",
-  SHIPPED:    "text-indigo-600",
+  PROCESSING: "text-teal-600",
+  SHIPPED:    "text-emerald-700",
   DELIVERED:  "text-green-700",
   CANCELLED:  "text-red-500",
   REFUNDED:   "text-slate-500",

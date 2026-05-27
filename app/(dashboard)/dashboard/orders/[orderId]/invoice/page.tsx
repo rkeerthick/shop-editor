@@ -59,7 +59,7 @@ export default async function InvoicePage({
         {/* Header */}
         <div className="flex items-start justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-bold text-indigo-600 mb-1">{shop.name}</h1>
+            <h1 className="text-3xl font-bold text-emerald-700 mb-1">{shop.name}</h1>
             <p className="text-slate-400 text-sm">Tax Invoice</p>
           </div>
           <div className="text-right">

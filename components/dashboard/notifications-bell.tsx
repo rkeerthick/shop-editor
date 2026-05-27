@@ -91,8 +91,8 @@ export function NotificationsBell({ initialData }: { initialData: NotificationDa
                     onClick={() => setOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                      <ShoppingCart className="w-4 h-4 text-blue-600" />
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0">
+                      <ShoppingCart className="w-4 h-4 text-emerald-700" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-slate-800">

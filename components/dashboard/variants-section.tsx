@@ -93,7 +93,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
           <button
             type="button"
             onClick={() => { setShowForm(true); setError(null); }}
-            className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            className="flex items-center gap-1.5 text-sm text-emerald-700 hover:text-emerald-800 font-medium"
           >
             <Plus className="w-4 h-4" /> Add variant
           </button>
@@ -102,13 +102,13 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
 
       {/* Add form */}
       {showForm && (
-        <div className="border border-indigo-100 bg-indigo-50/40 rounded-lg p-4 space-y-3">
+        <div className="border border-emerald-100 bg-emerald-50/40 rounded-lg p-4 space-y-3">
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-2 space-y-1">
               <label className="text-xs font-medium text-slate-600">Name *</label>
               <input
-                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 placeholder="e.g. Small / Red / Cotton"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -118,7 +118,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
               <label className="text-xs font-medium text-slate-600">Price (₹) *</label>
               <input
                 type="number" min="0" step="0.01"
-                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 placeholder="0.00"
                 value={form.price}
                 onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
@@ -128,7 +128,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
               <label className="text-xs font-medium text-slate-600">Stock</label>
               <input
                 type="number" min="0"
-                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 placeholder="0"
                 value={form.stock}
                 onChange={(e) => setForm((f) => ({ ...f, stock: e.target.value }))}
@@ -137,7 +137,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
             <div className="col-span-2 space-y-1">
               <label className="text-xs font-medium text-slate-600">SKU <span className="text-slate-400 font-normal">(optional)</span></label>
               <input
-                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full border border-slate-200 rounded-md px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-600"
                 placeholder="SKU-001"
                 value={form.sku}
                 onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
@@ -149,7 +149,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
               type="button"
               onClick={handleAdd}
               disabled={saving}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 disabled:opacity-60 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 text-white text-sm font-medium rounded-md hover:bg-emerald-800 disabled:opacity-60 transition-colors"
             >
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
               Add
@@ -181,10 +181,10 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
             <tbody>
               {variants.map((v) =>
                 editingId === v.id ? (
-                  <tr key={v.id} className="border-t border-slate-100 bg-indigo-50/30">
+                  <tr key={v.id} className="border-t border-slate-100 bg-emerald-50/30">
                     <td className="px-3 py-2">
                       <input
-                        className="w-full border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-full border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-600"
                         value={editForm.name}
                         onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
                       />
@@ -192,7 +192,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
                     <td className="px-3 py-2">
                       <input
                         type="number" min="0" step="0.01"
-                        className="w-24 border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-24 border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-600"
                         value={editForm.price}
                         onChange={(e) => setEditForm((f) => ({ ...f, price: e.target.value }))}
                       />
@@ -200,14 +200,14 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
                     <td className="px-3 py-2">
                       <input
                         type="number" min="0"
-                        className="w-20 border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-20 border border-slate-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-600"
                         value={editForm.stock}
                         onChange={(e) => setEditForm((f) => ({ ...f, stock: e.target.value }))}
                       />
                     </td>
                     <td className="px-3 py-2 hidden sm:table-cell">
                       <input
-                        className="w-full border border-slate-200 rounded px-2 py-1 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        className="w-full border border-slate-200 rounded px-2 py-1 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-emerald-600"
                         value={editForm.sku}
                         onChange={(e) => setEditForm((f) => ({ ...f, sku: e.target.value }))}
                       />
@@ -218,7 +218,7 @@ export function VariantsSection({ productId, initialVariants }: VariantsSectionP
                           type="button"
                           onClick={() => handleSaveEdit(v.id)}
                           disabled={saving}
-                          className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                          className="p-1.5 text-emerald-700 hover:bg-emerald-50 rounded transition-colors"
                         >
                           {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                         </button>

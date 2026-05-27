@@ -184,7 +184,7 @@ export function SettingsForm({ shop }: { shop: Shop }) {
                 key={f.value}
                 type="button"
                 onClick={() => setFontStyle(f.value)}
-                className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm transition-all ${fontStyle === f.value ? "border-indigo-500 bg-indigo-50 text-indigo-700" : "border-slate-200 hover:border-slate-300 text-slate-600"}`}
+                className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm transition-all ${fontStyle === f.value ? "border-emerald-600 bg-emerald-50 text-emerald-700" : "border-slate-200 hover:border-slate-300 text-slate-600"}`}
               >
                 <span className={`block text-base mb-0.5 ${f.preview}`}>Aa</span>
                 <span className="text-xs">{f.label}</span>
@@ -202,14 +202,14 @@ export function SettingsForm({ shop }: { shop: Shop }) {
                 key={b.value}
                 type="button"
                 onClick={() => setButtonStyle(b.value)}
-                className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm transition-all ${buttonStyle === b.value ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-slate-300"}`}
+                className={`flex-1 py-3 px-4 rounded-lg border-2 text-sm transition-all ${buttonStyle === b.value ? "border-emerald-600 bg-emerald-50" : "border-slate-200 hover:border-slate-300"}`}
               >
                 <span
                   className={`block text-xs px-3 py-1.5 bg-slate-800 text-white mb-1.5 mx-auto w-fit ${b.radius}`}
                 >
                   Button
                 </span>
-                <span className={`text-xs ${buttonStyle === b.value ? "text-indigo-700" : "text-slate-500"}`}>{b.label}</span>
+                <span className={`text-xs ${buttonStyle === b.value ? "text-emerald-700" : "text-slate-500"}`}>{b.label}</span>
               </button>
             ))}
           </div>

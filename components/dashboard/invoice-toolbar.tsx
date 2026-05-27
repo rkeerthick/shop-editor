@@ -7,7 +7,7 @@ export function InvoiceToolbar({ invoiceNo, orderId }: { invoiceNo: string; orde
       <div className="flex gap-3">
         <button
           onClick={() => window.print()}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
+          className="bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-medium px-4 py-1.5 rounded-lg transition-colors"
         >
           Print / Save as PDF
         </button>
