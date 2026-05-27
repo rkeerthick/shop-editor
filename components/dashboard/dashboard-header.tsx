@@ -1,9 +1,15 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { Search, CircleHelp } from "lucide-react";
+import { Search, CircleHelp, Store } from "lucide-react";
 import { NotificationsBell } from "./notifications-bell";
 
-export async function DashboardHeader({ shopId }: { shopId: string }) {
+interface DashboardHeaderProps {
+  shopId: string;
+  shopName: string;
+  shopSlug: string;
+}
+
+export async function DashboardHeader({ shopId, shopName, shopSlug }: DashboardHeaderProps) {
   const session = await auth();
   const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -45,9 +51,25 @@ export async function DashboardHeader({ shopId }: { shopId: string }) {
     .join("");
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 px-8 flex items-center gap-4 shrink-0">
-      {/* Search */}
-      <div className="relative flex-1 max-w-md">
+    <header className="h-14 bg-white border-b border-slate-200 px-4 md:px-8 flex items-center gap-3 shrink-0">
+
+      {/* Logo — mobile only (sidebar shows it on desktop) */}
+      <a
+        href={`/store/${shopSlug}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="md:hidden flex items-center gap-2 shrink-0 mr-1"
+      >
+        <div className="w-8 h-8 rounded-lg bg-emerald-700 flex items-center justify-center shadow-sm">
+          <Store className="w-4 h-4 text-white" />
+        </div>
+        <span className="font-bold text-slate-900 text-sm tracking-tight leading-none truncate max-w-30">
+          {shopName}
+        </span>
+      </a>
+
+      {/* Search — desktop only */}
+      <div className="relative flex-1 max-w-md hidden md:block">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
         <input
           placeholder="Search products, orders, customers…"
@@ -57,8 +79,9 @@ export async function DashboardHeader({ shopId }: { shopId: string }) {
 
       {/* Right actions */}
       <div className="flex items-center gap-1 ml-auto">
+        {/* Help — desktop only */}
         <button
-          className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          className="hidden md:flex w-9 h-9 rounded-lg items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
           title="Help"
         >
           <CircleHelp className="w-4 h-4" />
@@ -66,7 +89,7 @@ export async function DashboardHeader({ shopId }: { shopId: string }) {
         <NotificationsBell initialData={data} />
         {/* User avatar */}
         <div
-          className="w-8 h-8 rounded-full bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center ml-1 select-none"
+          className="w-8 h-8 rounded-full bg-emerald-700 text-white text-xs font-semibold flex items-center justify-center ml-1 select-none shrink-0"
           title={nameOrEmail}
         >
           {initials}

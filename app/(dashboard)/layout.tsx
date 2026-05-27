@@ -29,7 +29,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         />
       )}
       <main className="flex-1 overflow-auto flex flex-col">
-        {shop && <DashboardHeader shopId={shop.id} />}
+        {shop && <DashboardHeader shopId={shop.id} shopName={shop.name} shopSlug={shop.slug} />}
         <div className="p-4 md:p-8 pb-20 md:pb-8 flex-1">{children}</div>
       </main>
       {shop && <BottomNav />}
