@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function NewPageButton({ shopId }: { shopId: string }) {
+export function NewPageButton({ shopId, size = "default" }: { shopId: string; size?: "default" | "sm" }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -37,8 +37,20 @@ export function NewPageButton({ shopId }: { shopId: string }) {
   }
 
   if (!open) {
-    return (
-      <Button onClick={() => setOpen(true)}>New page</Button>
+    return size === "sm" ? (
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 text-white text-xs font-medium rounded-lg hover:bg-emerald-800 transition-colors"
+      >
+        <span className="text-base leading-none">+</span> New page
+      </button>
+    ) : (
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-700 text-white text-sm font-medium rounded-lg hover:bg-emerald-800 transition-colors"
+      >
+        <span className="text-base leading-none">+</span> New page
+      </button>
     );
   }
 
