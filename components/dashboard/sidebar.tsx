@@ -33,7 +33,7 @@ export function Sidebar({ shopName, shopSlug, email }: SidebarProps) {
 
   return (
     <aside
-      className={`bg-slate-900 flex flex-col py-5 shrink-0 shadow-xl transition-all duration-300 ${
+      className={`bg-slate-900 hidden md:flex flex-col py-5 shrink-0 shadow-xl transition-all duration-300 ${
         collapsed ? "w-17 px-2" : "w-64 px-3"
       }`}
     >

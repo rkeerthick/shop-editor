@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { BottomNav } from "@/components/dashboard/bottom-nav";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -29,8 +30,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
       )}
       <main className="flex-1 overflow-auto flex flex-col">
         {shop && <DashboardHeader shopId={shop.id} />}
-        <div className="p-8 flex-1">{children}</div>
+        <div className="p-4 md:p-8 pb-20 md:pb-8 flex-1">{children}</div>
       </main>
+      {shop && <BottomNav />}
     </div>
   );
 }
