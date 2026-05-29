@@ -23,6 +23,10 @@ const BOTTOM_NAV_ITEMS = [
 export function BottomNav() {
   const pathname = usePathname();
 
+  // Hide the dashboard nav inside the storefront block editor —
+  // it has its own fixed bottom action bar for mobile.
+  if (pathname.includes("/editor")) return null;
+
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-t border-slate-200 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]"
