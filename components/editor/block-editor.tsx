@@ -25,6 +25,7 @@ import type { EditorBlock, BlockType } from "@/types/blocks";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { Plus, Settings2, X, ChevronLeft } from "lucide-react";
 
 const BLOCK_TYPES: BlockType[] = ["hero", "product-grid", "banner", "text", "image", "cta"];
 
@@ -47,6 +48,8 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
   const [metaTitle, setMetaTitle] = useState(initialMetaTitle);
   const [metaDescription, setMetaDescription] = useState(initialMetaDescription);
   const [showSeo, setShowSeo] = useState(false);
+  // Mobile drawer states
+  const [mobileSheet, setMobileSheet] = useState<"add" | "config" | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -65,6 +68,7 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
     };
     setBlocks((prev) => [...prev, newBlock]);
     setSelectedId(newBlock.id);
+    setMobileSheet(null);
   }
 
   function updateBlock(id: string, props: Record<string, unknown>) {
@@ -109,17 +113,69 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
     setTimeout(() => setSaved(false), 2000);
   }, [blocks, pageId, metaTitle, metaDescription]);
 
+  // ── Left sidebar content (shared between desktop panel and mobile sheet) ──
+  const AddBlockPanel = () => (
+    <div className="flex flex-col gap-1">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Add block</p>
+      {BLOCK_TYPES.map((type) => (
+        <button
+          key={type}
+          onClick={() => addBlock(type)}
+          className="text-left px-3 py-2 rounded-lg text-sm hover:bg-emerald-50 hover:text-emerald-700 transition-colors font-medium text-slate-700"
+        >
+          {BLOCK_LABELS[type]}
+        </button>
+      ))}
+      <div className="mt-4 border-t pt-3">
+        <button
+          onClick={() => setShowSeo((v) => !v)}
+          className="text-left px-2 py-1.5 rounded text-xs w-full hover:bg-gray-100 transition-colors font-semibold text-muted-foreground uppercase tracking-wide"
+        >
+          SEO {showSeo ? "▲" : "▼"}
+        </button>
+        {showSeo && (
+          <div className="flex flex-col gap-2 mt-2 px-1">
+            <div>
+              <label className="text-xs text-muted-foreground">Meta title</label>
+              <input
+                className="w-full border rounded px-2 py-1 text-xs mt-0.5"
+                placeholder={pageTitle}
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">Meta description</label>
+              <textarea
+                className="w-full border rounded px-2 py-1 text-xs mt-0.5 resize-none"
+                rows={3}
+                placeholder="Page description for search engines"
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] -m-8">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-6 py-3 bg-white border-b shrink-0">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard/storefront" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>
-            ← Back
+    <div className="flex flex-col h-[calc(100vh-2rem)] -m-4 md:-m-8">
+
+      {/* ── Toolbar ── */}
+      <div className="flex items-center justify-between px-3 md:px-6 py-3 bg-white border-b shrink-0 gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Link
+            href="/dashboard/storefront"
+            className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "shrink-0 px-2")}
+          >
+            <ChevronLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Back</span>
           </Link>
-          <span className="font-medium">{pageTitle}</span>
+          <span className="font-medium text-sm truncate">{pageTitle}</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href={isHome ? `/store/${shopSlug}` : `/store/${shopSlug}/${pageSlug}`}
             target="_blank"
@@ -134,57 +190,25 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left — add blocks + SEO */}
-        <div className="w-48 bg-white border-r p-3 flex flex-col gap-1 overflow-y-auto shrink-0">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1 px-1">Add block</p>
-          {BLOCK_TYPES.map((type) => (
-            <button
-              key={type}
-              onClick={() => addBlock(type)}
-              className="text-left px-2 py-1.5 rounded text-sm hover:bg-gray-100 transition-colors"
-            >
-              {BLOCK_LABELS[type]}
-            </button>
-          ))}
-          <div className="mt-4 border-t pt-3">
-            <button
-              onClick={() => setShowSeo((v) => !v)}
-              className="text-left px-2 py-1.5 rounded text-xs w-full hover:bg-gray-100 transition-colors font-semibold text-muted-foreground uppercase tracking-wide"
-            >
-              SEO {showSeo ? "▲" : "▼"}
-            </button>
-            {showSeo && (
-              <div className="flex flex-col gap-2 mt-2 px-1">
-                <div>
-                  <label className="text-xs text-muted-foreground">Meta title</label>
-                  <input
-                    className="w-full border rounded px-2 py-1 text-xs mt-0.5"
-                    placeholder={pageTitle}
-                    value={metaTitle}
-                    onChange={(e) => setMetaTitle(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground">Meta description</label>
-                  <textarea
-                    className="w-full border rounded px-2 py-1 text-xs mt-0.5 resize-none"
-                    rows={3}
-                    placeholder="Page description for search engines"
-                    value={metaDescription}
-                    onChange={(e) => setMetaDescription(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+
+        {/* ── Desktop: Left sidebar ── */}
+        <div className="hidden md:flex w-48 bg-white border-r p-3 flex-col gap-1 overflow-y-auto shrink-0">
+          <AddBlockPanel />
         </div>
 
-        {/* Center — canvas */}
-        <div className="flex-1 overflow-y-auto bg-gray-100 p-6">
+        {/* ── Canvas ── */}
+        <div className="flex-1 overflow-y-auto bg-gray-100 p-3 md:p-6 pb-24 md:pb-6">
           {blocks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-muted-foreground mb-2">No blocks yet</p>
-              <p className="text-sm text-muted-foreground">Add a block from the left panel to get started.</p>
+            <div className="flex flex-col items-center justify-center h-full text-center gap-3">
+              <p className="text-muted-foreground">No blocks yet</p>
+              <p className="text-sm text-muted-foreground hidden md:block">Add a block from the left panel to get started.</p>
+              {/* Mobile hint */}
+              <button
+                onClick={() => setMobileSheet("add")}
+                className="md:hidden flex items-center gap-2 px-4 py-2 bg-emerald-700 text-white text-sm font-medium rounded-lg"
+              >
+                <Plus className="w-4 h-4" /> Add your first block
+              </button>
             </div>
           ) : (
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -195,7 +219,10 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
                       key={block.id}
                       block={block}
                       isSelected={selectedId === block.id}
-                      onClick={() => setSelectedId(block.id === selectedId ? null : block.id)}
+                      onClick={() => {
+                        setSelectedId(block.id === selectedId ? null : block.id);
+                        if (block.id !== selectedId) setMobileSheet("config");
+                      }}
                       onDelete={() => deleteBlock(block.id)}
                       onToggleVisibility={() => toggleVisibility(block.id)}
                     >
@@ -208,9 +235,9 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
           )}
         </div>
 
-        {/* Right — config panel */}
+        {/* ── Desktop: Right config panel ── */}
         {selectedBlock && (
-          <div className="w-72 bg-white border-l overflow-y-auto shrink-0">
+          <div className="hidden md:block w-72 bg-white border-l overflow-y-auto shrink-0">
             <BlockConfigPanel
               block={selectedBlock}
               onChange={(props) => updateBlock(selectedBlock.id, props)}
@@ -218,6 +245,106 @@ export function BlockEditor({ pageId, pageTitle, pageSlug, isHome, shopSlug, ini
           </div>
         )}
       </div>
+
+      {/* ── Mobile: Fixed bottom action bar ── */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 flex items-center gap-2 px-4 py-3"
+        style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+      >
+        <button
+          onClick={() => setMobileSheet("add")}
+          className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-700 text-white text-sm font-medium rounded-lg hover:bg-emerald-800 transition-colors"
+        >
+          <Plus className="w-4 h-4" /> Add Block
+        </button>
+        {selectedBlock && (
+          <button
+            onClick={() => setMobileSheet("config")}
+            className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-800 text-white text-sm font-medium rounded-lg hover:bg-slate-900 transition-colors"
+          >
+            <Settings2 className="w-4 h-4" /> Configure
+          </button>
+        )}
+      </div>
+
+      {/* ── Mobile: Slide-up sheet backdrop ── */}
+      {mobileSheet && (
+        <div
+          className="md:hidden fixed inset-0 z-50 bg-black/40"
+          onClick={() => setMobileSheet(null)}
+        />
+      )}
+
+      {/* ── Mobile: Add block sheet ── */}
+      <div
+        className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl transition-transform duration-300 ${
+          mobileSheet === "add" ? "translate-y-0" : "translate-y-full"
+        }`}
+        style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "70vh" }}
+      >
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <p className="font-semibold text-slate-800">Add Block</p>
+          <button onClick={() => setMobileSheet(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="overflow-y-auto p-3">
+          <div className="grid grid-cols-2 gap-2">
+            {BLOCK_TYPES.map((type) => (
+              <button
+                key={type}
+                onClick={() => addBlock(type)}
+                className="px-3 py-3 rounded-xl text-sm font-medium text-slate-700 bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200 hover:border-emerald-200 transition-colors text-left"
+              >
+                {BLOCK_LABELS[type]}
+              </button>
+            ))}
+          </div>
+          {/* SEO in mobile sheet too */}
+          <div className="mt-4 border-t pt-3">
+            <button
+              onClick={() => setShowSeo((v) => !v)}
+              className="text-left px-2 py-1.5 rounded text-xs w-full hover:bg-gray-100 transition-colors font-semibold text-muted-foreground uppercase tracking-wide"
+            >
+              SEO {showSeo ? "▲" : "▼"}
+            </button>
+            {showSeo && (
+              <div className="flex flex-col gap-2 mt-2 px-1">
+                <div>
+                  <label className="text-xs text-muted-foreground">Meta title</label>
+                  <input className="w-full border rounded px-2 py-1 text-xs mt-0.5" placeholder={pageTitle} value={metaTitle} onChange={(e) => setMetaTitle(e.target.value)} />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Meta description</label>
+                  <textarea className="w-full border rounded px-2 py-1 text-xs mt-0.5 resize-none" rows={3} placeholder="Page description for search engines" value={metaDescription} onChange={(e) => setMetaDescription(e.target.value)} />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Mobile: Config sheet ── */}
+      {selectedBlock && (
+        <div
+          className={`md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-2xl transition-transform duration-300 ${
+            mobileSheet === "config" ? "translate-y-0" : "translate-y-full"
+          }`}
+          style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "80vh" }}
+        >
+          <div className="flex items-center justify-between px-4 py-3 border-b">
+            <p className="font-semibold text-slate-800">Configure Block</p>
+            <button onClick={() => setMobileSheet(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="overflow-y-auto">
+            <BlockConfigPanel
+              block={selectedBlock}
+              onChange={(props) => updateBlock(selectedBlock.id, props)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
