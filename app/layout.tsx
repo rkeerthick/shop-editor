@@ -25,6 +25,14 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: "default",
     title: "Shop Editor",
+    startupImage: "/apple-touch-icon.png",
+  },
+  icons: {
+    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
   },
   formatDetection: { telephone: false },
   manifest: "/manifest.webmanifest",
