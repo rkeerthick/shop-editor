@@ -1,12 +1,15 @@
-const CACHE_NAME = "shop-editor-v1";
+const CACHE_NAME = "shop-editor-v2";
 
-// Pages to cache immediately on install
-const PRECACHE_URLS = ["/", "/dashboard", "/login"];
+// Only pre-cache pages that are always publicly accessible (no auth redirect)
+const PRECACHE_URLS = ["/login"];
 
-// ── Install: pre-cache shell pages ──────────────────────────────────────────
+// ── Install ──────────────────────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME).then((cache) =>
+      // Use individual adds with error handling — one failure won't abort install
+      Promise.allSettled(PRECACHE_URLS.map((url) => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
@@ -23,14 +26,16 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// ── Fetch: network-first with cache fallback ─────────────────────────────────
+// ── Fetch: network-first, cache on success ───────────────────────────────────
 self.addEventListener("fetch", (event) => {
-  // Only handle GET requests; skip API calls and auth routes
   const url = new URL(event.request.url);
+
+  // Skip: non-GET, API routes, Next.js internals, auth callbacks
   if (
     event.request.method !== "GET" ||
     url.pathname.startsWith("/api/") ||
-    url.pathname.startsWith("/_next/webpack") ||
+    url.pathname.startsWith("/_next/") ||
+    url.pathname.startsWith("/manifest") ||
     url.pathname.includes("hot-update")
   ) {
     return;
@@ -39,11 +44,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Cache successful HTML and static asset responses
+        // Only cache valid 200 responses for static assets
         if (
           response.status === 200 &&
-          (event.request.destination === "document" ||
-            event.request.destination === "script" ||
+          (event.request.destination === "script" ||
             event.request.destination === "style" ||
             event.request.destination === "image" ||
             event.request.destination === "font")
@@ -53,11 +57,6 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       })
-      .catch(() => {
-        // Offline fallback — serve cached version
-        return caches.match(event.request).then(
-          (cached) => cached ?? caches.match("/dashboard")
-        );
-      })
+      .catch(() => caches.match(event.request))
   );
 });
