@@ -48,9 +48,14 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* Hard-coded link tags — most reliable cross-browser approach */}
+        {/* Manifest — Android Chrome reads the icon from here */}
+        <link rel="manifest" href="/manifest.webmanifest" />
+
+        {/* iOS Safari — reads apple-touch-icon for home screen */}
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32"  href="/favicon.png" />
+
+        {/* Favicons */}
+        <link rel="icon" type="image/png" sizes="32x32"   href="/favicon.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
         <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png" />
       </head>
